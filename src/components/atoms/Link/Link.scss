@@ -1,0 +1,12 @@
+.link {
+  display: block;
+  color: #007bff;
+  text-decoration: none;
+  text-align: right;
+  margin-bottom: 20px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

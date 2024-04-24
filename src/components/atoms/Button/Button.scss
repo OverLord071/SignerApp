@@ -1,0 +1,36 @@
+.button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 15px;
+
+  &.primary {
+    background-color: #007bff;
+
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+
+  &.cancel {
+    background-color: #f44336;
+
+    &:hover {
+      background-color: #d32f2f;
+    }
+  }
+
+  &.file {
+    background-color: #4CAF50;
+
+    &:hover {
+      background-color: #45a049;
+    }
+  }
+}

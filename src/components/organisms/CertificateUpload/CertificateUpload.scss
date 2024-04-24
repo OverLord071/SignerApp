@@ -1,0 +1,63 @@
+.certificate-upload-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 300px;
+  margin: auto;
+  padding: 40px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  background-color: #ffffff;
+
+  .dropzone {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+
+    &:hover {
+      background-color: #d1eaff;
+      border-color: #0092de;
+    }
+
+    p {
+      text-align: center;
+      color: #555555;
+    }
+
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    button {
+      width: auto;
+      margin-bottom: 10px;
+    }
+  }
+
+  .button-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+}

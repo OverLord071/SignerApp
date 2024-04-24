@@ -1,0 +1,46 @@
+.input-container {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 10px;
+  border-radius: 13px;
+  margin-bottom: 20px;
+  border: 2px solid gray;
+
+  &.invalid {
+    border: 2px solid red;
+
+    .input-icon-error {
+      color: red;
+    }
+  }
+
+  &.focused {
+    border: 2px solid #0092de;
+  }
+
+  .input-icon {
+    margin-right: 10px;
+    color: #888;
+  }
+
+  .input-field {
+    flex-grow: 1;
+    border: none;
+    background-color: white;
+    outline: none;
+    font-size: 15px;
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bolder;
+  font-size: 17px;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}

@@ -164,7 +164,7 @@ export async function getDocumentsByEmail(email: string) {
 
 export async function updateDocumentIsSigned(id: string) {
     try {
-        const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/${id}`);
+        const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/signer/api/Document/${id}`);
         return response.data;
     } catch (error) {
         throw new Error('Error al actualizar el documento');

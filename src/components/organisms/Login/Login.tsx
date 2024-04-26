@@ -23,7 +23,6 @@ const Login = () => {
     const [errors, setErrors] = useState<Errors>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [showListDocuments, setShowListDocuments] = useState(false);
-    const [userId, setUserId] = useState('');
     const [showVerification, setShowVerification] = useState(false);
     const [email, setEmail] = useState('');
     const [token, setToken] = useState('');
@@ -60,7 +59,6 @@ const Login = () => {
                 const user = await authenticateUser(username, password);
                 toast.success('Iniciando session');
                 if (user.emailVerified) {
-                    setUserId(user.ci);
                     getToken().then(token => {
                         setToken(token);
                         setShowListDocuments(true);

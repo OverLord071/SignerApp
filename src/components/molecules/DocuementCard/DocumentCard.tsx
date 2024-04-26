@@ -5,7 +5,7 @@ import Button from "../../atoms/Button/Button";
 
 type Document = {
     id: string;
-    tittle: string;
+    title: string;
     url: string;
     isSigned: boolean;
 };
@@ -13,14 +13,13 @@ type Document = {
 interface DocuementCardProps {
     document: Document;
     onSign: () => void;
-    onReject: () => void;
 }
 
-const DocuementCard: FC<DocuementCardProps> = ({document, onReject, onSign}) => {
+const DocumentCard: FC<DocuementCardProps> = ({document, onSign}) => {
     return (
         <div className="document-card">
             <img src="/img.png" alt="PDF Icon" className="document-card__image"/>
-            <h4 className="document-card__title">{document.tittle}</h4>
+            <h4 className="document-card__title">{document.title}</h4>
             <div className="document-card__actions">
                 <Button text="Firmar" onClick={onSign} variant="primary--small" />
             </div>
@@ -28,4 +27,4 @@ const DocuementCard: FC<DocuementCardProps> = ({document, onReject, onSign}) => 
     );
 };
 
-export default DocuementCard;
+export default DocumentCard;

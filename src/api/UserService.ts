@@ -3,7 +3,7 @@ import FormData from 'form-data';
 
 export const authenticateUser = async (usernameOrEmail: string, password: string) => {
     try {
-        const response = await axios.post(`https://localhost:7159/api/DW/login?usernameOrEmail=${usernameOrEmail}&password=${password}`);
+        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/login?usernameOrEmail=${usernameOrEmail}&password=${password}`);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -57,7 +57,7 @@ export async function replaceFileContent(token: string, documentoCodificado: str
     }
 }
 
-export async function singPdf(certificateFile: File, password: string, pdfFile: File, reason: string, location: string, posX: number, posY: number) {
+export async function singPdf(certificateFile: File, password: string, pdfFile: Blob, reason: string, location: string, page: number, posX: number, posY: number) {
     const formData = new FormData();
 
     formData.append('certificateFile', certificateFile);
@@ -65,7 +65,7 @@ export async function singPdf(certificateFile: File, password: string, pdfFile: 
 
     const encodedPassword = encodeURIComponent(password);
 
-    const response = await axios.post(`https://localhost:7159/api/DW/sign-pdf?password=${encodedPassword}&reason=${reason}&location=${location}&positionX=${posX}&positionY=${posY}`, formData, {
+    const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sign-pdf?password=${encodedPassword}&reason=${reason}&location=${location}&page=${page}&positionX=${posX}&positionY=${posY}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
             'accept': '*/*'
@@ -129,7 +129,7 @@ export async function createCertificate(id: string, certificate: File, pinCertif
 
 export async function verifyEmail(email: string, verificationCode: string) {
     try {
-        const response = await axios.post(`https://localhost:7159/api/DW/verifyEmail?email=${email}&verificationCode=${verificationCode}`);
+        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/verifyEmail?email=${email}&verificationCode=${verificationCode}`);
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
@@ -150,6 +150,24 @@ export async function updateCertificate(id: string, certificate: string, pinCert
         return response.data;
     } catch (error) {
         throw new Error('Error al actualizar el certificado');
+    }
+}
+
+export async function getDocumentsByEmail(email: string) {
+    try {
+        const response = await axios.get(`https://dwdemos.digitalsolutions.com.ec/signer/api/Document/${email}`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al obtener los documentos');
+    }
+}
+
+export async function updateDocumentIsSigned(id: string) {
+    try {
+        const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/${id}`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al actualizar el documento');
     }
 }
 

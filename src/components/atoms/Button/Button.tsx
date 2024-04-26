@@ -4,7 +4,7 @@ import './Button.scss';
 interface ButtonProps {
     text: string;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-    variant?: 'primary' | 'cancel' | 'file';
+    variant?: 'primary' | 'cancel' | 'file' | 'primary--small' | 'cancel--small';
     Icon?: ReactNode;
     type?: 'button' | 'submit' | 'reset';
 }

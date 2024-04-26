@@ -26,7 +26,8 @@ const Login = () => {
     const [userId, setUserId] = useState('');
     const [showVerification, setShowVerification] = useState(false);
     const [email, setEmail] = useState('');
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState('');
+
 
     const handleInputChange = (value: string, setter: (value: string) => void, field: string, pattern: string) => {
         setter(value);
@@ -58,8 +59,7 @@ const Login = () => {
             try {
                 const user = await authenticateUser(username, password);
                 toast.success('Iniciando session');
-                if (user.emailVerified)
-                {
+                if (user.emailVerified) {
                     setUserId(user.ci);
                     getToken().then(token => {
                         setToken(token);
@@ -67,7 +67,8 @@ const Login = () => {
                     }).catch(error => {
                         console.log(error);
                     });
-                } else {
+                }
+                else {
                     setEmail(user.email);
                     setShowVerification(true);
                 }
@@ -98,7 +99,7 @@ const Login = () => {
     }
 
     if (showListDocuments) {
-        return <ListDocuments/>
+        return <ListDocuments token={token}/>
     }
 
     if (showVerification) {
@@ -109,7 +110,7 @@ const Login = () => {
         <div className="login-container">
             <form onSubmit={handleLogin}>
                 <ToastContainer/>
-                <Label text="Contenedor de Certificados"/>
+                <Label text="Firmador"/>
                 <Input
                     type="text"
                     placeholder="User name / Email"

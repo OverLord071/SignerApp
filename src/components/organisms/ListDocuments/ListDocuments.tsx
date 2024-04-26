@@ -1,5 +1,8 @@
-import React, {FC, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import PdfSigner from "../PdfSigner/PdfSigner";
+import {getDocumentsByEmail} from "../../../api/UserService";
+import DocumentCard from "../../molecules/DocuementCard/DocumentCard";
+import './ListDocuments.scss';
 
 type Document = {
     id: string;
@@ -8,11 +11,19 @@ type Document = {
     isSigned: boolean;
 };
 
-const ListDocuments : FC<{}> = () => {
+const ListDocuments : FC<{token: string}> = ({token}) => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [toSignedDocument, setToSignedDocument] = useState<Document|null>();
 
-    const signedDocuments = documents.filter(doc => doc.isSigned);
+    useEffect(()=>{
+        const fetchDocuments = async () => {
+            const docs = await getDocumentsByEmail('calbarracin@digitalsolutions.com.ec');
+            console.log(docs);
+            setDocuments(docs);
+        };
+        fetchDocuments();
+    }, []);
+
     const noSignedDocuments = documents.filter(doc => !doc.isSigned);
 
     const handleSignSuccess = () => {
@@ -25,26 +36,22 @@ const ListDocuments : FC<{}> = () => {
     };
 
     return (
-        <div>
+        <div className="document-container">
             {toSignedDocument ? (
-                <PdfSigner token="" document={toSignedDocument} onSignSuccess={handleSignSuccess} onSignFailure={handleSignFailure}/>
+                <PdfSigner token={token} document={toSignedDocument} onSignSuccess={handleSignSuccess}
+                           onSignFailure={handleSignFailure}/>
             ) : (
                 <>
                     <h2>Documentos por firmar</h2>
-                    {noSignedDocuments.map(doc => (
-                        <div key={doc.id}>
-                            <p>{doc.title}</p>
-                            <button onClick={() => setToSignedDocument(doc)}>
-                                Firmar
-                            </button>
-                        </div>
-                    ))}
-                    <h2>Historial de documentos firmados</h2>
-                    {signedDocuments.map(doc => (
-                        <div key={doc.id}>
-                            <p>{doc.title}</p>
-                        </div>
-                    ))}
+                    <div className="document-grid">
+                        {noSignedDocuments.map(doc => (
+                            <DocumentCard
+                                key={doc.id}
+                                document={doc}
+                                onSign={() => setToSignedDocument(doc)}
+                            />
+                        ))}
+                    </div>
                 </>
             )}
         </div>

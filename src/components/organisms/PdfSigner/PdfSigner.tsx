@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FC, useRef, useState} from 'react';
+import React, {ChangeEvent, FC, useEffect, useRef, useState} from 'react';
 import {MinimalButton, ScrollMode, SpecialZoomLevel, Viewer, ViewMode, Worker} from '@react-pdf-viewer/core';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 import './PdfSigner.scss';
@@ -7,7 +7,7 @@ import Button from "../../atoms/Button/Button";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
-import {replaceFileContent, singPdf} from "../../../api/UserService";
+import {replaceFileContent, singPdf, updateDocumentIsSigned} from "../../../api/UserService";
 import {Errors, validateField} from "../../../types/validation";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -20,7 +20,10 @@ import {
 } from "@react-pdf-viewer/page-navigation";
 import {thumbnailPlugin} from "@react-pdf-viewer/thumbnail";
 
+
 type Document = {
+    id: string;
+    title: string;
     url: string;
     isSigned: boolean;
 };
@@ -44,18 +47,30 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
     const [x, setX] = useState<number>(0);
     const [y, setY] = useState<number>(0);
     const [pin, setPin] = useState('');
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const certInputRef = useRef<HTMLInputElement>(null);
     const [certificateFile, setCertificateFile] = useState<File | null>(null);
-    const [isSigned, setIsSigned] = useState<boolean>(false);
-    const pdfFile = document ? document.url : null;
     const [errors, setErrors] = useState<Errors>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
 
     const pageNavigationPluginInstance = pageNavigationPlugin();
     const { jumpToNextPage, jumpToPreviousPage , CurrentPageLabel} = pageNavigationPluginInstance;
     const thumbnailPluginInstance = thumbnailPlugin();
     const [currentPage, setCurrentPage] = useState(0);
+
+    useEffect(() => {
+        const  fetchPdf = async (url: string) => {
+          const response = await fetch(url);
+          const data = await response.blob();
+          const blobUrl = URL.createObjectURL(data);
+          setUrlPdfFile(blobUrl);
+          setPdfBlob(data);
+        };
+        if (document) {
+            fetchPdf(document.url);
+        }
+
+    },[document]);
 
     const handleInputChange = (value: string, setter: (value: string) => void, field: string, pattern: string) => {
         setter(value);
@@ -67,13 +82,6 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
         }
         setErrors(newErrors);
     }
-
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            files.length > 0 && setUrlPdfFile(URL.createObjectURL(files[0]));
-        }
-    };
 
     const handleCertChange = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -103,23 +111,22 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            if (certificateFile && pdfFile && token) {
+            if (certificateFile && pdfBlob && token) {
                 try {
-                    const signedPdfBase64 = await singPdf(certificateFile, pin, pdfFile, reason, location, x, - y + 796)
+                    const signedPdfBase64 = await singPdf(certificateFile, pin, pdfBlob, reason, location, currentPage, x, - y + 796)
                     console.log(signedPdfBase64);
                     toast.success('El documento se firmo correctamente.');
-                    const pdfFileName = pdfFile.name.split('.').slice(0, -1).join('.');
+                    const pdfFileName = document ? document.id : '';
                     try {
                         await replaceFileContent(token ,signedPdfBase64, pdfFileName);
                         toast.success('El documento se reemplazo correctamente.');
-                        setIsSigned(true);
+                        await updateDocumentIsSigned(pdfFileName);
                         setTimeout(() => {
                             onSignSuccess();
                         }, 2000);
                     } catch (error) {
                         console.error(error);
                         toast.error('Hubo un error al reemplazar el documento.');
-                        setIsSigned(false);
                         setTimeout(() => {
                             onSignFailure();
                         }, 2000);
@@ -196,7 +203,6 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
                 <div className="buttons-container">
                     <input type="file" ref={certInputRef} style={{display: 'none'}} onChange={handleCertChange}/>
                     <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>
-                    <input type="file" ref={fileInputRef} style={{display: 'none'}} onChange={handleFileChange}/>
                     <Button text={"Firmar"} onClick={handleSingClick}/>
                 </div>
                 <ToastContainer/>

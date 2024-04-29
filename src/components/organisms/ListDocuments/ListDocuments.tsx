@@ -53,36 +53,38 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
             ) : (
                 <>
                     <h2>Documentos por firmar</h2>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tipo de Documento</th>
-                            <th>Fecha</th>
-                            <th>Firmar</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {noSignedDocuments
-                            .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
-                            .map(doc => (
-                                <tr key={doc.id}>
-                                    <td>{doc.id}</td>
-                                    <td>{doc.title}</td>
-                                    <td>{new Date(doc.date).toLocaleDateString()}</td>
-                                    <td>
-                                        <Button
-                                            text="Firmar"
-                                            onClick={() => setToSignedDocument(doc)}
-                                        />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <div className="table-container">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tipo de Documento</th>
+                                <th>Fecha</th>
+                                <th>Firmar</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {noSignedDocuments
+                                .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
+                                .map(doc => (
+                                    <tr key={doc.id}>
+                                        <td>{doc.id}</td>
+                                        <td>{doc.title}</td>
+                                        <td>{new Date(doc.date).toLocaleDateString()}</td>
+                                        <td>
+                                            <Button
+                                                text="Firmar"
+                                                onClick={() => setToSignedDocument(doc)}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                     <ReactPaginate
-                        previousLabel={'Anterior'}
-                        nextLabel={'Siguiente'}
+                        previousLabel={<button className="pagination-button">Anterior</button>}
+                        nextLabel={<button className="pagination-button">Siguiente</button>}
                         breakLabel={'...'}
                         breakClassName={'break-me'}
                         pageCount={pageCount}
@@ -91,6 +93,8 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
                         onPageChange={handlePageClick}
                         containerClassName={'pagination'}
                         activeClassName={'active'}
+                        pageClassName={'page-item'}
+                        pageLinkClassName={'page-link'}
                     />
                 </>
             )}

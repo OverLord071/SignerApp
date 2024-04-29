@@ -179,27 +179,6 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
                     required
                     isSubmitted={isSubmitted}
                 />
-                <Input
-                    type="text"
-                    placeholder="X"
-                    value={(x + 2).toString()}
-                    onChange={(value: string) => setX(Number(value))}
-                    label="Pos X"
-                />
-                <Input
-                    type="text"
-                    placeholder="Y"
-                    value={(- y + 796).toString()}
-                    onChange={(value: string) => setY(Number(value))}
-                    label="Pos Y"
-                />
-                <Input
-                    type="text"
-                    placeholder="page"
-                    value={currentPage.toString()}
-                    onChange={(value: string) => setCurrentPage(Number(value))}
-                    label="Page"
-                />
                 <div className="buttons-container">
                     <input type="file" ref={certInputRef} style={{display: 'none'}} onChange={handleCertChange}/>
                     <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>

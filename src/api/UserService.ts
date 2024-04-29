@@ -158,6 +158,7 @@ export async function getDocumentsByEmail(email: string) {
         const response = await axios.get(`https://dwdemos.digitalsolutions.com.ec/signer/api/Document/${email}`);
         return response.data;
     } catch (error) {
+        console.log(error);
         throw new Error('Error al obtener los documentos');
     }
 }

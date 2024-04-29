@@ -57,6 +57,7 @@ const Login = () => {
         if (Object.keys(newErrors).length === 0) {
             try {
                 const user = await authenticateUser(username, password);
+                setEmail(user.email);
                 toast.success('Iniciando session');
                 if (user.emailVerified) {
                     getToken().then(token => {
@@ -97,7 +98,7 @@ const Login = () => {
     }
 
     if (showListDocuments) {
-        return <ListDocuments token={token}/>
+        return <ListDocuments token={token} email={email}/>
     }
 
     if (showVerification) {

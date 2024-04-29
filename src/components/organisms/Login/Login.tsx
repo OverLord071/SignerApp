@@ -9,7 +9,7 @@ import Label from "../../atoms/Label/Label";
 import Registrer from "../Register/Registrer";
 import PasswordRecovery from "../PasswordRecovery/PasswordRecovery";
 import {Errors, validateField } from "../../../types/validation";
-import {authenticateUser, getToken} from "../../../api/UserService";
+import {authenticateUser, getToken, sendPinValidation} from "../../../api/UserService";
 import Verification from "../Verification/Verification";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -69,6 +69,7 @@ const Login = () => {
                 }
                 else {
                     setEmail(user.email);
+                    await sendPinValidation(email);
                     setShowVerification(true);
                 }
             } catch (error) {

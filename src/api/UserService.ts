@@ -107,7 +107,7 @@ export async function getUserById(id: string) {
 
 export async function sendPinValidation(email: string) {
     try {
-        const response = await axios.post('https://localhost:7159/api/DW/sendPinValidation', {email});
+        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sendPinValidation?${email}`, );
         return response.data;
     } catch (error) {
         throw new Error('Error al enviar el PIN de validación');

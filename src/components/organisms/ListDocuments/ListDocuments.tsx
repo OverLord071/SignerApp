@@ -2,7 +2,6 @@ import React, {FC, useEffect, useState} from 'react';
 import PdfSigner from "../PdfSigner/PdfSigner";
 import {getDocumentsByEmail} from "../../../api/UserService";
 import './ListDocuments.scss';
-import ReactPaginate from "react-paginate";
 import Button from "../../atoms/Button/Button";
 
 type Document = {
@@ -10,7 +9,7 @@ type Document = {
     title: string;
     url: string;
     isSigned: boolean;
-    date: Date;
+    date: string;
 };
 
 const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
@@ -18,7 +17,7 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
     const [toSignedDocument, setToSignedDocument] = useState<Document|null>();
 
     const [currentPage, setCurrentPage] = useState<number>(0);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20;
 
     useEffect(()=>{
         const fetchDocuments = async () => {
@@ -41,15 +40,14 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
         setToSignedDocument(null);
     };
 
-    const handlePageClick = ({selected}: { selected: number}) => {
-      setCurrentPage(selected);
-    };
 
     return (
         <div className="document-container">
             {toSignedDocument ? (
-                <PdfSigner token={token} document={toSignedDocument} onSignSuccess={handleSignSuccess}
-                           onSignFailure={handleSignFailure}/>
+                <div className="pdf-signer-container">
+                    <PdfSigner token={token} document={toSignedDocument} onSignSuccess={handleSignSuccess}
+                               onSignFailure={handleSignFailure}/>
+                </div>
             ) : (
                 <>
                     <h2>Documentos por firmar</h2>
@@ -82,20 +80,23 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
                             </tbody>
                         </table>
                     </div>
-                    <ReactPaginate
-                        previousLabel={<button className="pagination-button">Anterior</button>}
-                        nextLabel={<button className="pagination-button">Siguiente</button>}
-                        breakLabel={'...'}
-                        breakClassName={'break-me'}
-                        pageCount={pageCount}
-                        marginPagesDisplayed={2}
-                        pageRangeDisplayed={5}
-                        onPageChange={handlePageClick}
-                        containerClassName={'pagination'}
-                        activeClassName={'active'}
-                        pageClassName={'page-item'}
-                        pageLinkClassName={'page-link'}
-                    />
+                    <div className="pagination-container">
+                        <div className="results-text">
+                            Mostrando {currentPage * itemsPerPage + 1} a {(currentPage + 1) * itemsPerPage} de {noSignedDocuments.length} resultados
+                        </div>
+                        <div className="pagination-buttons">
+                            <button
+                                onClick={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
+                            >
+                                Anterior
+                            </button>
+                            <button
+                                onClick={() => currentPage < pageCount - 1 && setCurrentPage(currentPage + 1)}
+                            >
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
                 </>
             )}
         </div>

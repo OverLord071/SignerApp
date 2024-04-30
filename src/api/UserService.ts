@@ -76,11 +76,7 @@ export async function singPdf(certificateFile: File, password: string, pdfFile: 
 
 export async function changePassword(email: string, validationPin: string, newPassword: string) {
     try {
-        const response = await axios.post('https://localhost:7159/api/DW/changePassword', {
-            email,
-            validationPin,
-            newPassword
-        });
+        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/changePassword?${email}&validationPin=${validationPin}&newPassword=${newPassword}`);
         return response.data;
     } catch (error) {
         throw new Error('Error al cambiar la contraseña');
@@ -107,7 +103,7 @@ export async function getUserById(id: string) {
 
 export async function sendPinValidation(email: string) {
     try {
-        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sendPinValidation?${email}`, );
+        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sendPinValidation?${email}`);
         return response.data;
     } catch (error) {
         throw new Error('Error al enviar el PIN de validación');

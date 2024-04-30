@@ -188,31 +188,10 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
             </div>
             <div className="pdf-viewer">
                 {urlPdfFile && (
-                    <div
-                        style={{
-                            border: '1px solid rgba(0, 0, 0, .3)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                        }}
-                    >
+                    <div className="pdf-container">
                         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-                            <div
-                                style={{
-                                    borderBottom: '1px solid rgba(0, 0, 0, .3)',
-                                    height: '54rem',
-                                    position: 'relative',
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        alignItems: 'center',
-                                        backgroundColor: '#eeeeee',
-                                        borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        padding: '8px',
-                                    }}
-                                >
+                            <div className="worker-container">
+                                <div className="current-page-label">
                                     <CurrentPageLabel>
                                         {(props: RenderCurrentPageLabelProps) => {
                                             setCurrentPage(props.currentPage+1)
@@ -220,15 +199,7 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
                                         }}
                                     </CurrentPageLabel>
                                 </div>
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '1rem',
-                                        transform: 'translate(0, -100%) rotate(-90deg)',
-                                        zIndex: '1',
-                                    }}
-                                >
+                                <div className="previous-button">
                                     <MinimalButton onClick={jumpToPreviousPage}>
                                         <PreviousIcon/>
                                     </MinimalButton>
@@ -241,15 +212,7 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
                                     plugins={[pageNavigationPluginInstance, thumbnailPluginInstance]}
 
                                 />
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        right: '1rem',
-                                        transform: 'translate(0, -100%) rotate(-90deg)',
-                                        zIndex: '1',
-                                    }}
-                                >
+                                <div className="next-button">
                                     <MinimalButton onClick={jumpToNextPage}>
                                         <NextIcon/>
                                     </MinimalButton>

@@ -68,7 +68,7 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
                                     <tr key={doc.id}>
                                         <td>{doc.id}</td>
                                         <td>{doc.title}</td>
-                                        <td>{new Date(doc.date).toLocaleDateString()}</td>
+                                        <td>{doc.date}</td>
                                         <td>
                                             <Button
                                                 text="Firmar"

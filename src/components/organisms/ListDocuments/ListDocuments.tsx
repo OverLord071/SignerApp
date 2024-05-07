@@ -12,7 +12,7 @@ type Document = {
     date: string;
 };
 
-const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
+const ListDocuments : FC<{ email: string}> = ({ email}) => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [toSignedDocument, setToSignedDocument] = useState<Document|null>();
 
@@ -45,7 +45,7 @@ const ListDocuments : FC<{token: string, email: string}> = ({token, email}) => {
         <div className="document-container">
             {toSignedDocument ? (
                 <div className="pdf-signer-container">
-                    <PdfSigner token={token} document={toSignedDocument} onSignSuccess={handleSignSuccess}
+                    <PdfSigner document={toSignedDocument} onSignSuccess={handleSignSuccess}
                                onSignFailure={handleSignFailure}/>
                 </div>
             ) : (

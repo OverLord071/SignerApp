@@ -9,7 +9,7 @@ import Label from "../../atoms/Label/Label";
 import Registrer from "../Register/Registrer";
 import PasswordRecovery from "../PasswordRecovery/PasswordRecovery";
 import {Errors, validateField } from "../../../types/validation";
-import {authenticateUser, getToken, sendPinValidation} from "../../../api/UserService";
+import {authenticateUser, sendPinValidation} from "../../../api/UserService";
 import Verification from "../Verification/Verification";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,7 +25,6 @@ const Login = () => {
     const [showListDocuments, setShowListDocuments] = useState(false);
     const [showVerification, setShowVerification] = useState(false);
     const [email, setEmail] = useState('');
-    const [token, setToken] = useState('');
 
 
     const handleInputChange = (value: string, setter: (value: string) => void, field: string, pattern: string) => {
@@ -60,12 +59,7 @@ const Login = () => {
                 setEmail(user.email);
                 toast.success('Iniciando session');
                 if (user.emailVerified) {
-                    getToken().then(token => {
-                        setToken(token);
-                        setShowListDocuments(true);
-                    }).catch(error => {
-                        console.log(error);
-                    });
+                    setShowListDocuments(true);
                 }
                 else {
                     setEmail(user.email);
@@ -99,7 +93,7 @@ const Login = () => {
     }
 
     if (showListDocuments) {
-        return <ListDocuments token={token} email={email}/>
+        return <ListDocuments email={email}/>
     }
 
     if (showVerification) {

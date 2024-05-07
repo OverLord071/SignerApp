@@ -7,7 +7,7 @@ import Button from "../../atoms/Button/Button";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
-import {replaceFileContent, singPdf, updateDocumentIsSigned} from "../../../api/UserService";
+import {getToken, replaceFileContent, singPdf, updateData, updateDocumentIsSigned} from "../../../api/UserService";
 import {Errors, validateField} from "../../../types/validation";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -28,8 +28,18 @@ type Document = {
     isSigned: boolean;
 };
 
+interface SignParams {
+    certificateFile: File;
+    password: string;
+    pdfFile: Blob;
+    reason: string;
+    location: string;
+    page: number;
+    posX: number;
+    posY: number;
+}
+
 interface PdfSignerProps {
-    token: string | null;
     document: Document | null;
     onSignSuccess: Function;
     onSignFailure: Function;
@@ -40,7 +50,7 @@ interface ErrorResponse {
     pdfFile?: string[];
 }
 
-const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFailure}) => {
+const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}) => {
     const [reason, setReason] = useState<string>('');
     const [location, setLocation] = useState<string>('');
     const [urlPdfFile, setUrlPdfFile] = useState('');
@@ -111,25 +121,44 @@ const PdfSigner: FC<PdfSignerProps> = ({token, document, onSignSuccess, onSignFa
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            if (certificateFile && pdfBlob && token) {
+            if (certificateFile && pdfBlob) {
                 try {
-                    const signedPdfBase64 = await singPdf(certificateFile, pin, pdfBlob, reason, location, currentPage, x, - y + 796)
-                    console.log(signedPdfBase64);
+                    const signParams : SignParams = {
+                        certificateFile: certificateFile,
+                        password: pin,
+                        pdfFile: pdfBlob,
+                        reason: reason,
+                        location: location,
+                        page: currentPage,
+                        posX: x,
+                        posY: -y + 796
+                    };
+
+                    const signedPdfBase64 = await singPdf(signParams);
                     toast.success('El documento se firmo correctamente.');
                     const pdfFileName = document ? document.id : '';
                     try {
-                        await replaceFileContent(token ,signedPdfBase64, pdfFileName);
-                        toast.success('El documento se reemplazo correctamente.');
+                        const token = await getToken();
+                        const replaceResponse = await replaceFileContent(token ,signedPdfBase64, pdfFileName);
+                        toast.info('Cargando documento a DocuWare...');
+
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                        const updateResponse = await updateData(replaceResponse.objeto.dwdocid);
+
+                        if (updateResponse.data.estado !== 'UPDATED') {
+                            toast.error('El estado del documento no se actualizó.');
+                        }
+
                         await updateDocumentIsSigned(pdfFileName);
                         setTimeout(() => {
                             onSignSuccess();
-                        }, 2000);
+                        }, 1000);
                     } catch (error) {
                         console.error(error);
                         toast.error('Hubo un error al reemplazar el documento.');
                         setTimeout(() => {
                             onSignFailure();
-                        }, 2000);
+                        }, 1000);
                     }
 
                 } catch (error) {

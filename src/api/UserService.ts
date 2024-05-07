@@ -1,5 +1,28 @@
+// noinspection Annotator
+
 import axios from 'axios';
 import FormData from 'form-data';
+
+interface SignParams {
+    certificateFile: File;
+    password: string;
+    pdfFile: Blob;
+    reason: string;
+    location: string;
+    page: number;
+    posX: number;
+    posY: number;
+}
+
+interface UpdateDataResponse {
+    mensaje: string;
+    data: {
+        documento: string | null;
+        fileCabinet: string;
+        dwdocid: number;
+        estado: string;
+    };
+}
 
 export const authenticateUser = async (usernameOrEmail: string, password: string) => {
     try {
@@ -40,6 +63,7 @@ export const getToken = async () => {
 
 export async function replaceFileContent(token: string, documentoCodificado: string, documentId: string) {
     try {
+        // noinspection Annotator
         const response = await axios.post('https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Item/ReplaceFileContentJ', {
             documentoCodificado: documentoCodificado,
             extension: 'pdf',
@@ -57,15 +81,29 @@ export async function replaceFileContent(token: string, documentoCodificado: str
     }
 }
 
-export async function singPdf(certificateFile: File, password: string, pdfFile: Blob, reason: string, location: string, page: number, posX: number, posY: number) {
+export async function updateData(dwdocid: number): Promise<UpdateDataResponse> {
+     try {
+         const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Item/UpdateData/${dwdocid}`,{
+             indices: "ESTADO:OK|",
+             documentoCodificado: "",
+             extension: ""
+         });
+         return response.data;
+     } catch (error) {
+         throw new Error(`Error al actualizar los datos: ${error}`);
+     }
+}
+
+export async function singPdf(params: SignParams) {
     const formData = new FormData();
 
-    formData.append('certificateFile', certificateFile);
-    formData.append('pdfFile', pdfFile);
+    formData.append('certificateFile', params.certificateFile);
+    formData.append('pdfFile', params.pdfFile);
 
-    const encodedPassword = encodeURIComponent(password);
+    const encodedPassword = encodeURIComponent(params.password);
 
-    const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sign-pdf?password=${encodedPassword}&reason=${reason}&location=${location}&page=${page}&positionX=${posX}&positionY=${posY}`, formData, {
+    // noinspection Annotator
+    const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/sign-pdf?password=${encodedPassword}&reason=${params.reason}&location=${params.location}&page=${params.page}&positionX=${params.posX}&positionY=${params.posY}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
             'accept': '*/*'
@@ -74,30 +112,12 @@ export async function singPdf(certificateFile: File, password: string, pdfFile: 
     return response.data;
 }
 
-export async function changePassword(email: string, validationPin: string, newPassword: string) {
-    try {
-        const response = await axios.post(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/changePassword?${email}&validationPin=${validationPin}&newPassword=${newPassword}`);
-        return response.data;
-    } catch (error) {
-        throw new Error('Error al cambiar la contraseña');
-    }
-}
-
 export async function createUser(user: any) {
     try {
         const response = await axios.post('https://localhost:7159/api/DW/register', user);
         return response.data;
     } catch (error) {
         throw new Error('Error al crear el usuario');
-    }
-}
-
-export async function getUserById(id: string) {
-    try {
-        const response = await axios.get(`https://localhost:7159/api/DW/${id}`);
-        return response.data;
-    } catch (error) {
-        throw new Error('Error al obtener el usuario');
     }
 }
 
@@ -133,19 +153,6 @@ export async function verifyEmail(email: string, verificationCode: string) {
         } else {
             throw new Error(`Error desconocido al verificar el correo: ${error}`);
         }
-    }
-}
-
-export async function updateCertificate(id: string, certificate: string, pinCertificate: string) {
-    try {
-        const response = await axios.post(`https://localhost:7159/api/DW/updateCertificate`, {
-            id,
-            certificate,
-            pinCertificate
-        });
-        return response.data;
-    } catch (error) {
-        throw new Error('Error al actualizar el certificado');
     }
 }
 

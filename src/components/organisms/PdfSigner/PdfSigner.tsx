@@ -142,8 +142,8 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                         const replaceResponse = await replaceFileContent(token ,signedPdfBase64, pdfFileName);
                         toast.info('Cargando documento a DocuWare...');
 
-                        await new Promise(resolve => setTimeout(resolve, 3000));
-                        const updateResponse = await updateData(replaceResponse.objeto.dwdocid);
+                        await new Promise(resolve => setTimeout(resolve, 5000));
+                        const updateResponse = await updateData(replaceResponse.objeto.dwdocid, token);
 
                         if (updateResponse.data.estado !== 'UPDATED') {
                             toast.error('El estado del documento no se actualizó.');

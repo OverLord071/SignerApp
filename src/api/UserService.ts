@@ -81,12 +81,16 @@ export async function replaceFileContent(token: string, documentoCodificado: str
     }
 }
 
-export async function updateData(dwdocid: number): Promise<UpdateDataResponse> {
+export async function updateData(dwdocid: number, token: string): Promise<UpdateDataResponse> {
      try {
          const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Item/UpdateData/${dwdocid}`,{
              indices: "ESTADO:OK|",
              documentoCodificado: "",
              extension: ""
+         }, {
+             headers: {
+                 'Authorization': 'Bearer ' + token,
+             }
          });
          return response.data;
      } catch (error) {

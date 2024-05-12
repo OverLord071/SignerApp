@@ -1,5 +1,5 @@
 import React, {ChangeEvent, FC, useEffect, useRef, useState} from 'react';
-import {MinimalButton, ScrollMode, SpecialZoomLevel, Viewer, ViewMode, Worker} from '@react-pdf-viewer/core';
+import {SpecialZoomLevel, Viewer, Worker} from '@react-pdf-viewer/core';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 import './PdfSigner.scss';
 import Input from "../../atoms/Input/Input";
@@ -12,14 +12,7 @@ import {Errors, validateField} from "../../../types/validation";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {AxiosError} from "axios";
-import {
-    NextIcon,
-    pageNavigationPlugin,
-    PreviousIcon,
-    RenderCurrentPageLabelProps
-} from "@react-pdf-viewer/page-navigation";
-import {thumbnailPlugin} from "@react-pdf-viewer/thumbnail";
-
+import {pageNavigationPlugin, RenderCurrentPageLabelProps} from "@react-pdf-viewer/page-navigation";
 
 type Document = {
     id: string;
@@ -64,8 +57,9 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
     const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
 
     const pageNavigationPluginInstance = pageNavigationPlugin();
-    const { jumpToNextPage, jumpToPreviousPage , CurrentPageLabel} = pageNavigationPluginInstance;
-    const thumbnailPluginInstance = thumbnailPlugin();
+    const { CurrentPageInput, GoToFirstPageButton, GoToLastPageButton, GoToNextPageButton, GoToPreviousPage } =
+        pageNavigationPluginInstance;
+    const { CurrentPageLabel} = pageNavigationPluginInstance;
     const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
@@ -150,11 +144,11 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                         }
 
                         await updateDocumentIsSigned(pdfFileName);
+                        toast.success("El documento se cargo correctamente.");
                         setTimeout(() => {
                             onSignSuccess();
                         }, 1000);
                     } catch (error) {
-                        console.error(error);
                         toast.error('Hubo un error al reemplazar el documento.');
                         setTimeout(() => {
                             onSignFailure();
@@ -163,7 +157,6 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
 
                 } catch (error) {
                     const axiosError = error as AxiosError;
-                    console.log(axiosError);
                     const errors = axiosError.response?.data as ErrorResponse;
                     if (axiosError.response?.status === 500){
                         toast.error('Error: ' + axiosError.response.data);
@@ -220,31 +213,60 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                     <div className="pdf-container">
                         <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
                             <div className="worker-container">
-                                <div className="current-page-label">
-                                    <CurrentPageLabel>
-                                        {(props: RenderCurrentPageLabelProps) => {
-                                            setCurrentPage(props.currentPage+1)
-                                            return <span>{`${props.currentPage + 1} of ${props.numberOfPages}`}</span>
+                                <div className="rpv-core__viewer"
+                                     style={{
+                                         border: '1px solid rgba(0, 0, 0, 0.3)',
+                                         display: 'flex',
+                                         flexDirection: 'column',
+                                         height: '100%',
+                                     }}
+                                >
+                                    <div
+                                        style={{
+                                            alignItems: 'center',
+                                            backgroundColor: '#eeeeee',
+                                            borderBottom: '1px solid rgba(0, 0, 0, 0.3)',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            padding: '2px',
                                         }}
-                                    </CurrentPageLabel>
-                                </div>
-                                <div className="previous-button">
-                                    <MinimalButton onClick={jumpToPreviousPage}>
-                                        <PreviousIcon/>
-                                    </MinimalButton>
-                                </div>
-                                <Viewer
-                                    defaultScale={SpecialZoomLevel.ActualSize}
-                                    scrollMode={ScrollMode.Page}
-                                    viewMode={ViewMode.SinglePage}
-                                    fileUrl={urlPdfFile}
-                                    plugins={[pageNavigationPluginInstance, thumbnailPluginInstance]}
-
-                                />
-                                <div className="next-button">
-                                    <MinimalButton onClick={jumpToNextPage}>
-                                        <NextIcon/>
-                                    </MinimalButton>
+                                    >
+                                        <div style={{padding: '0px 2px'}}>
+                                            <GoToFirstPageButton/>
+                                        </div>
+                                        <div style={{padding: '0px 2px'}}>
+                                            <GoToPreviousPage/>
+                                        </div>
+                                        <div style={{padding: '0px 2px', width: '4rem'}}>
+                                            <CurrentPageInput/>
+                                        </div>
+                                        <div className="current-page-label">
+                                            <CurrentPageLabel>
+                                                {(props: RenderCurrentPageLabelProps) => {
+                                                    setCurrentPage(props.currentPage+1)
+                                                    return <span>{`/ ${props.numberOfPages}`}</span>
+                                                }}
+                                            </CurrentPageLabel>
+                                        </div>
+                                        <div style={{padding: '0px 2px'}}>
+                                            <GoToNextPageButton/>
+                                        </div>
+                                        <div style={{padding: '0px 2px'}}>
+                                            <GoToLastPageButton/>
+                                        </div>
+                                    </div>
+                                    <div
+                                        style={{
+                                            flex: 1,
+                                            overflow: 'hidden',
+                                        }}
+                                    >
+                                        <Viewer
+                                            defaultScale={SpecialZoomLevel.PageFit}
+                                            fileUrl={urlPdfFile}
+                                            plugins={[pageNavigationPluginInstance]}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </Worker>

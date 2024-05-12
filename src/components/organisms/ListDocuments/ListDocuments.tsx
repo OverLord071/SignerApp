@@ -21,8 +21,7 @@ const ListDocuments : FC<{ email: string}> = ({ email}) => {
 
     useEffect(()=>{
         const fetchDocuments = async () => {
-            const docs = await getDocumentsByEmail(email);
-            console.log(docs);
+            const docs = await getDocumentsByEmail(email)
             setDocuments(docs);
         };
         fetchDocuments();

@@ -1,5 +1,5 @@
 import React, {ChangeEvent, FC, useEffect, useRef, useState} from 'react';
-import {SpecialZoomLevel, Viewer, Worker} from '@react-pdf-viewer/core';
+import {ScrollMode, SpecialZoomLevel, Viewer, Worker} from '@react-pdf-viewer/core';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 import './PdfSigner.scss';
 import Input from "../../atoms/Input/Input";
@@ -263,6 +263,7 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                                     >
                                         <Viewer
                                             defaultScale={SpecialZoomLevel.PageFit}
+                                            scrollMode={ScrollMode.Page}
                                             fileUrl={urlPdfFile}
                                             plugins={[pageNavigationPluginInstance]}
                                         />

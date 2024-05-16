@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Input from "../../atoms/Input/Input";
 import {FaEnvelope, FaKey} from "react-icons/fa";
 import './Login.scss';
@@ -9,7 +9,7 @@ import Label from "../../atoms/Label/Label";
 import Registrer from "../Register/Registrer";
 import PasswordRecovery from "../PasswordRecovery/PasswordRecovery";
 import {Errors, validateField } from "../../../types/validation";
-import {authenticateUser, sendPinValidation} from "../../../api/UserService";
+import {authenticateUser, authenticateWithToken, sendPinValidation} from "../../../api/UserService";
 import Verification from "../Verification/Verification";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -26,6 +26,21 @@ const Login = () => {
     const [showVerification, setShowVerification] = useState(false);
     const [email, setEmail] = useState('');
 
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            authenticateWithToken(token)
+                .then((userEmail: string)=>{
+                    setEmail(userEmail);
+                    setShowListDocuments(true);
+                })
+                .catch((error: Error) => {
+                   console.log(error);
+                });
+        }
+    }, []);
 
     const handleInputChange = (value: string, setter: (value: string) => void, field: string, pattern: string) => {
         setter(value);

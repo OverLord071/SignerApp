@@ -39,6 +39,21 @@ export const authenticateUser = async (usernameOrEmail: string, password: string
     }
 };
 
+export const authenticateWithToken = async (token: string) => {
+    try {
+        const response = await axios.get(`https://dwdemos.digitalsolutions.com.ec/signer/api/DW/authenticateWithToken?token=${token}`);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        if (axios.isAxiosError(error) && error.response) {
+            console.error(error.response.data);
+            throw new Error(JSON.stringify(error.response.data.message, null, 2));
+        } else {
+            throw new Error(`Error desconocido: ${error}`);
+        }
+    }
+}
+
 export const getToken = async () => {
     const data = {
         "uri": "https://dwdemos.digitalsolutions.com.ec/DocuWare/Platform/",

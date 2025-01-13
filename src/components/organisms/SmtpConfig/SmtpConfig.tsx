@@ -18,8 +18,8 @@ const SmtpConfig = () => {
     const [port, setPort] = useState(0);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
     const [logo, setLogo] = useState<File | null>(null);
+
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,6 @@ const SmtpConfig = () => {
             try {
                 setLoading(true);
                 const data = await getSmtpConfig();
-                console.log(data);
                 if (data.length > 0) {
                     const config = data[0];
                     setSmtpConfig(config);
@@ -48,7 +47,7 @@ const SmtpConfig = () => {
         fetchConfig();
     }, []);
 
-    const handleSubmit = async () => {
+    const handleSaveConfig = async () => {
         setIsSubmitted(true);
 
         if (!host || !port || !username || !password) {
@@ -72,6 +71,11 @@ const SmtpConfig = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleTestConnection = () => {
+        alert("Probar conexión SMTP (pendiente de implementación)");
+        // Implementar lógica para probar la conexión SMTP aquí.
     };
 
     return (
@@ -122,9 +126,9 @@ const SmtpConfig = () => {
                     error={!password ? "La contraseña es obligatoria" : ""}
                 />
                 <Button
-                    text={"Guardar Configuración"}
-                    type={"submit"}
-                    onClick={handleSubmit}
+                    text={smtpConfig ? "Probar Conexión" : "Guardar Configuración SMTP"}
+                    type="button"
+                    onClick={smtpConfig ? handleTestConnection : handleSaveConfig}
                 />
             </div>
             <div className="smtp-config-right">

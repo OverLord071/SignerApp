@@ -1,0 +1,61 @@
+.file-input-wrapper {
+  margin-bottom: 20px;
+
+  label {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    display: inline-block;
+    color: #666;
+  }
+
+  .file-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    transition: border-color 0.2s, background-color 0.2s;
+    position: relative;
+
+    &:hover {
+      border-color: #0092de;
+      background-color: #eaf6ff;
+    }
+
+    .file-icon {
+      margin-right: 8px;
+      color: #666;
+    }
+
+    span {
+      font-size: 0.95rem;
+      color: #666;
+    }
+
+    &.invalid {
+      border-color: #e53935;
+      background-color: #fdecea;
+
+      .file-icon {
+        color: #e53935;
+      }
+
+      span {
+        color: #e53935;
+      }
+    }
+
+    input[type='file'] {
+      display: none;
+    }
+  }
+
+  .error-message {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #e53935;
+  }
+}

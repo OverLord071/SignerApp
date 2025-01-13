@@ -1,5 +1,5 @@
 import React, {ChangeEvent, FC, useEffect, useRef, useState} from 'react';
-import {ScrollMode, SpecialZoomLevel, Viewer, Worker} from '@react-pdf-viewer/core';
+import { ScrollMode, SpecialZoomLevel, Viewer, Worker} from '@react-pdf-viewer/core';
 import Draggable, {DraggableEventHandler} from 'react-draggable';
 import './PdfSigner.scss';
 import Input from "../../atoms/Input/Input";
@@ -7,12 +7,20 @@ import Button from "../../atoms/Button/Button";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
-import {getToken, replaceFileContent, singPdf, updateData, updateDocumentIsSigned} from "../../../api/UserService";
+import {
+    getToken,
+    rejectDocument,
+    replaceFileContent,
+    singPdf,
+    updateData,
+    updateDocumentIsSigned
+} from "../../../api/UserService";
 import {Errors, validateField} from "../../../types/validation";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {AxiosError} from "axios";
 import {pageNavigationPlugin, RenderCurrentPageLabelProps} from "@react-pdf-viewer/page-navigation";
+import {useNavigate} from "react-router";
 
 type Document = {
     id: string;
@@ -55,12 +63,16 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
     const [errors, setErrors] = useState<Errors>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+    const [reasonReject, setReasonReject] = useState<string>('');
+    const [isRejecting, setIsRejecting] = useState(false);
 
     const pageNavigationPluginInstance = pageNavigationPlugin();
     const { CurrentPageInput, GoToFirstPageButton, GoToLastPageButton, GoToNextPageButton, GoToPreviousPage } =
         pageNavigationPluginInstance;
     const { CurrentPageLabel} = pageNavigationPluginInstance;
     const [currentPage, setCurrentPage] = useState(0);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const  fetchPdf = async (url: string) => {
@@ -174,38 +186,76 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
         }
     };
 
+    const handleRejectDocument= async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!document || !document.id) {
+            toast.error('El documento no tiene un ID o no es válido.');
+            return;
+        }
+        try {
+            await rejectDocument(document.id, reasonReject);
+            toast.success('El documento se rechazo correctamente.');
+            setIsRejecting(false);
+            navigate("documentos");
+        } catch (error) {
+            console.log('Error al rechazar el documento', error);
+            toast.error('Error al rechazar el documento: ' + error);
+        }
+    };
+
     return (
         <div className="pdf-signer">
             <div className="inputs-container">
-                <Input
-                    type="text"
-                    placeholder="Razón"
-                    value={reason}
-                    onChange={setReason}
-                    label="Razón"
-                />
-                <Input
-                    type="text"
-                    placeholder="Ubicación"
-                    value={location}
-                    onChange={setLocation}
-                    label="Ubicación"
-                />
-                <Input
-                    type="password"
-                    placeholder="Pin Certificado"
-                    value={pin}
-                    onChange={(value) => handleInputChange(value, setPin, 'pin', '')}
-                    label="Pin Certificado"
-                    error={errors.pin}
-                    required
-                    isSubmitted={isSubmitted}
-                />
-                <div className="buttons-container">
-                    <input type="file" ref={certInputRef} style={{display: 'none'}} onChange={handleCertChange}/>
-                    <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>
-                    <Button text={"Firmar"} onClick={handleSingClick}/>
-                </div>
+                {!isRejecting ? (
+                    <>
+                        <Input
+                            type="text"
+                            placeholder="Razón"
+                            value={reason}
+                            onChange={setReason}
+                            label="Razón"
+                        />
+                        <Input
+                            type="text"
+                            placeholder="Ubicación"
+                            value={location}
+                            onChange={setLocation}
+                            label="Ubicación"
+                        />
+                        <Input
+                            type="password"
+                            placeholder="Pin Certificado"
+                            value={pin}
+                            onChange={(value) => handleInputChange(value, setPin, 'pin', '')}
+                            label="Pin Certificado"
+                            error={errors.pin}
+                            required
+                            isSubmitted={isSubmitted}
+                        />
+                        <div className="buttons-container">
+                            <input type="file" ref={certInputRef} style={{display: 'none'}} onChange={handleCertChange}/>
+                            <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>
+                            <Button text="Firmar" onClick={handleSingClick}/>
+                            <Button text="Rechazar" variant="cancel" onClick={() => setIsRejecting(true)}/>
+                        </div>
+                    </>
+                ) : (
+                    <form onSubmit={handleRejectDocument}>
+                        <Input
+                            type="text"
+                            placeholder="Razón del rechazo"
+                            value={reasonReject}
+                            onChange={setReasonReject}
+                            label="Razón del rechazo"
+                            required
+                        />
+                        <div className="buttons-container">
+                            <Button text="Rechazar" variant="primary" onClick={handleRejectDocument}/>
+                            <Button text="Cancelar" variant="cancel" onClick={() => setIsRejecting(false)}/>
+                        </div>
+                    </form>
+                )}
+
                 <ToastContainer/>
             </div>
             <div className="pdf-viewer">
@@ -272,7 +322,9 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                             </div>
                         </Worker>
                         <Draggable position={{x, y}} onStop={handleStop}>
-                            <div className="signature-rectangle">FIRMA</div>
+                            <div className="signature-rectangle">
+                                FIRMA
+                            </div>
                         </Draggable>
                     </div>
                 )}

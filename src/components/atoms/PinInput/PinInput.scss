@@ -1,0 +1,32 @@
+.pin-input-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.pin-input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 1.5rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pin-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.pin-input--disabled {
+  background-color: #f9f9f9;
+  cursor: not-allowed;
+  border-color: #ddd;
+}
+
+.pin-input:not(:focus):hover {
+  border-color: #bbb;
+}

@@ -53,7 +53,7 @@ const Verification: FC<{onVerified: () => void, email: string}> = ({onVerified, 
                     type="text"
                     placeholder="Código de verificación."
                     value={code}
-                    onChange={(value) => handleInputChange(value, setCode, "code", "\\d+")}
+                    onChange={(value) => handleInputChange(value as string, setCode, "code", "\\d+")}
                     pattern="\d+"
                     required
                     error={errors.code}

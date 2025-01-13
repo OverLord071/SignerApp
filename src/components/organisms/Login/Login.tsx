@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import Input from "../../atoms/Input/Input";
-import {FaEnvelope, FaKey} from "react-icons/fa";
+import {FaEnvelope} from "react-icons/fa";
 import './Login.scss';
 import Button from "../../atoms/Button/Button";
 import Link from "../../atoms/Link/Link";
@@ -9,13 +9,18 @@ import Label from "../../atoms/Label/Label";
 import Registrer from "../Register/Registrer";
 import PasswordRecovery from "../PasswordRecovery/PasswordRecovery";
 import {Errors, validateField } from "../../../types/validation";
-import {authenticateUser, authenticateWithToken, sendPinValidation} from "../../../api/UserService";
+import {authenticateUser, authenticateWithToken} from "../../../api/UserService";
 import Verification from "../Verification/Verification";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import ListDocuments from "../ListDocuments/ListDocuments";
+import {useNavigate} from "react-router";
 
-const Login = () => {
+interface LoginProps {
+    onLogin: (user: { role: number; email: string }) => void;
+}
+
+const Login: FC<LoginProps> = ({onLogin}) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showRegister, setShowRegister] = useState(false);
@@ -26,18 +31,20 @@ const Login = () => {
     const [showVerification, setShowVerification] = useState(false);
     const [email, setEmail] = useState('');
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
 
         if (token) {
             authenticateWithToken(token)
-                .then((userEmail: string)=>{
+                .then((userEmail: string) => {
                     setEmail(userEmail);
                     setShowListDocuments(true);
                 })
                 .catch((error: Error) => {
-                   console.log(error);
+                    console.log(error);
                 });
         }
     }, []);
@@ -73,13 +80,11 @@ const Login = () => {
                 const user = await authenticateUser(username, password);
                 setEmail(user.email);
                 toast.success('Iniciando session');
-                if (user.emailVerified) {
+                onLogin(user);
+                if (user.role === 1) {
+                    navigate("/documentos");
+                } else {
                     setShowListDocuments(true);
-                }
-                else {
-                    setEmail(user.email);
-                    await sendPinValidation(email);
-                    setShowVerification(true);
                 }
             } catch (error) {
                 if (error instanceof Error) {
@@ -99,6 +104,7 @@ const Login = () => {
         setShowVerification(true);
     };
 
+
     if (showRegister) {
         return <Registrer onRegistered={handleRegistered} onCancel={() => setShowRegister(false)}/>;
     }
@@ -108,7 +114,7 @@ const Login = () => {
     }
 
     if (showListDocuments) {
-        return <ListDocuments email={email}/>
+        return <ListDocuments email={email} isAdmin={false}/>
     }
 
     if (showVerification) {
@@ -123,6 +129,7 @@ const Login = () => {
                 <Input
                     type="text"
                     placeholder="User name / Email"
+                    label="User name / Email"
                     value={username}
                     onChange={(value) => handleInputChange(value, setUsername, 'username', '')}
                     Icon={FaEnvelope}
@@ -133,9 +140,9 @@ const Login = () => {
                 <Input
                     type="password"
                     placeholder="Password"
+                    label="Password"
                     value={password}
                     onChange={(value) => handleInputChange(value, setPassword, 'password', '')}
-                    Icon={FaKey}
                     required
                     error={errors.password}
                     isSubmitted={isSubmitted}

@@ -1,0 +1,61 @@
+@import '../../../App.scss';
+
+.smtp-config-container {
+  display: flex;
+  justify-content: space-between;
+  padding: $padding-base;
+  gap: 50px;
+  width: 1000px;
+
+  .smtp-config-left,
+  .smtp-config-right {
+    flex: 1;
+    max-width: 100%;
+  }
+
+  .smtp-config-left {
+    display: flex;
+    flex-direction: column;
+
+    h2 {
+      margin-bottom: $padding-large;
+      font-size: $font-size-large;
+      font-weight: 600;
+      color: $font-color;
+    }
+
+    .input-field {
+      margin-bottom: $padding-base;
+    }
+  }
+
+  .smtp-config-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    h2 {
+      margin-bottom: $padding-large;
+      font-size: $font-size-large;
+      font-weight: 600;
+      color: $font-color;
+    }
+
+    .logo-preview {
+      margin-top: $padding-large;
+
+      h4 {
+        margin-bottom: $padding-base;
+        font-size: $font-size-base;
+      }
+
+      .logo-image-preview {
+        width: 300px;
+        height: auto;
+        border-radius: $border-radius-base;
+        box-shadow: $box-shadow-base;
+      }
+    }
+  }
+}

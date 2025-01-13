@@ -78,13 +78,9 @@ const Registrer : FC<{onRegistered: (email: string) => void, onCancel: () => voi
                     ci: cedula,
                     name: name,
                     email: email,
-                    certificate: "",
-                    pinCertificate: "",
                     userName: username,
                     password: password,
-                    role: "user",
-                    validationPin: "",
-                    emailVerified: false
+                    role: 0,
                 };
 
                 await createUser(user);
@@ -105,7 +101,7 @@ const Registrer : FC<{onRegistered: (email: string) => void, onCancel: () => voi
                     type="text"
                     placeholder="Nombre Completo"
                     value={name}
-                    onChange={(value) => handleInputChange(value, setName, "name", "[A-Za-z\\s]+")}
+                    onChange={(value) => handleInputChange(value as string, setName, "name", "[A-Za-z\\s]+")}
                     Icon={FaUser}
                     pattern="[A-Za-z\s]+"
                     required
@@ -118,7 +114,7 @@ const Registrer : FC<{onRegistered: (email: string) => void, onCancel: () => voi
                         type="text"
                         placeholder="Cedula"
                         value={cedula}
-                        onChange={(value) => handleInputChange(value, setCedula, "cedula", "\\d{10}")}
+                        onChange={(value) => handleInputChange(value as string, setCedula, "cedula", "\\d{10}")}
                         Icon={FaIdCard}
                         pattern="\d{10}"
                         required
@@ -130,7 +126,7 @@ const Registrer : FC<{onRegistered: (email: string) => void, onCancel: () => voi
                         type="text"
                         placeholder="nombre.apellido"
                         value={username}
-                        onChange={(value) => handleInputChange(value, setUsername, "username", "[A-Za-z\\s]+")}
+                        onChange={(value) => handleInputChange(value as string, setUsername, "username", "[A-Za-z\\s]+")}
                         pattern="[A-Za-z\s]+"
                         Icon={FaUser}
                         required

@@ -1,11 +1,13 @@
+@import '../../../App.scss';
+
 .document-container {
-  width: 100%;
-  padding: 20px;
+  width: 1000px;
+  padding: $padding-large;
   box-sizing: border-box;
 
   h2 {
-    color: #333;
-    font-size: 24px;
+    color: $font-color;
+    font-size: $font-size-large;
   }
 
   .pdf-signer-container {
@@ -15,7 +17,7 @@
   }
 
   .table-container {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
 
     table {
@@ -23,51 +25,59 @@
       border-collapse: collapse;
 
       thead {
-        color: #fff;
+        color: $table-header-color;
         tr {
-          background-color: #1B2845;
+          background-color: $primary-color;
         }
       }
 
       th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
+        padding: $padding-base;
       }
 
       tbody {
         tr:nth-child(even) {
-          background-color: #f2f2f2;
+          background-color: $table-row-even-color;
+        }
+      }
+
+      td {
+        &:last-child {
+          width: 150px;
+          display: flex;
+          justify-content: flex-start;
+          gap: 10px;
         }
       }
     }
   }
 
   .pagination-container {
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     .results-text {
-      color: #000000;
-      font-size: 16px;
+      color: $font-color;
+      font-size: $font-size-base;
     }
 
     .pagination-buttons {
       button {
-        background-color: #1B2845;
-        color: #fff;
-        padding: 10px 20px;
+        background-color: $button-bg-color;
+        color: $button-color;
+        padding: $padding-base $padding-large;
         border: none;
         cursor: pointer;
 
         &:hover {
-          background-color: #555;
+          background-color: $button-hover-bg-color;
         }
 
         &:disabled {
-          background-color: #999;
+          background-color: $button-disabled-bg-color;
           cursor: not-allowed;
         }
       }

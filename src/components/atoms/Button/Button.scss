@@ -55,4 +55,27 @@
       background-color: #45a049;
     }
   }
+
+  &.toggle {
+    &.active {
+      background-color: #4caf50;
+
+      &:hover {
+        background-color: #388e3c;
+      }
+    }
+
+    &.inactive {
+      background-color: #f44336;
+
+      &:hover {
+        background-color: #d32f2f;
+      }
+    }
+  }
+}
+
+.button.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

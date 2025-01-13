@@ -1,0 +1,107 @@
+@import "../../../App.scss";
+
+.user-table-container {
+  padding: $padding-large;
+  margin: 0 auto;
+  width: 1000px;
+  box-sizing: border-box;
+
+  h2 {
+    font-size: $font-size-base;
+    color: $font-color;
+    margin-bottom: $padding-large;
+    text-align: center;
+  }
+
+  .filter-container {
+    margin-bottom: $padding-base;
+    display: flex;
+    justify-content: center;
+  }
+
+  .table-container {
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+
+      th, td {
+        padding: $padding-base;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      thead {
+        background-color: $primary-color;
+        color: $table-header-color;
+      }
+
+      tbody tr:nth-child(even) {
+        background-color: $table-row-even-color;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .user-image {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          margin-right: 40px;
+        }
+
+        div {
+          display: inline-block;
+          text-align: center;
+        }
+
+        .user-name,
+        .user-email {
+          margin: 0;
+          font-size: $font-size-base;
+        }
+      }
+
+      td {
+        &:last-child {
+          display: flex;
+          justify-content: flex-start;
+          gap: 10px;
+        }
+      }
+    }
+  }
+
+  .pagination-container {
+    margin-top: $padding-large;
+    display: flex;
+    justify-content: center;
+
+    button {
+      margin: 0 5px;
+      padding: $padding-small $padding-large;
+      border: none;
+      cursor: pointer;
+      background-color: $button-bg-color;
+      color: $button-color;
+      font-size: $font-size-small;
+
+      &:hover {
+        background-color: $button-hover-bg-color;
+      }
+
+      &:disabled {
+        background-color: $button-disabled-bg-color;
+        cursor: not-allowed;
+      }
+    }
+
+    span {
+      margin: 0 10px;
+    }
+  }
+}

@@ -39,8 +39,11 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
         fetchDocuments();
     }, [email, isAdmin]);
 
-    const noSignedDocuments = documents.filter(doc => !doc.isSigned && doc.statusDocument === 'Enviado');
-    const pageCount = Math.ceil(noSignedDocuments.length / itemsPerPage);
+    const documentsToDisplay = isAdmin
+        ? documents
+        : documents.filter(doc => !doc.isSigned && doc.statusDocument === 'Enviado');
+
+    const pageCount = Math.ceil(documentsToDisplay.length / itemsPerPage);
 
     const handleSignSuccess = () => {
         setDocuments(documents.map(doc => doc.id === toSignedDocument?.id ? {...doc, isSigned: true} : doc));
@@ -82,7 +85,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
             ) : (
                 <>
                     <h2>{isAdmin ? "Todos los documentos" : "Documentos por firmar"}</h2>
-                    {noSignedDocuments.length === 0 ? (
+                    {documentsToDisplay.length === 0 ? (
                         <div className="no-documents-alert">
                             <p>No tienes documentos por firmar.</p>
                         </div>
@@ -96,12 +99,12 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
                                         <th>ID</th>
                                         <th>Fecha envío</th>
                                         <th>Fecha expiración</th>
-                                        <th>Estado</th>
+                                        {isAdmin && <th>Estado</th>}
                                         <th>Acción</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {noSignedDocuments
+                                    {documentsToDisplay
                                         .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
                                         .map(doc => (
                                             <tr key={doc.id}>
@@ -109,7 +112,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
                                                 <td>{doc.id}</td>
                                                 <td>{doc.date}</td>
                                                 <td>{doc.expiration}</td>
-                                                <td>{doc.statusDocument}</td>
+                                                {isAdmin && <td>{doc.statusDocument}</td>}
                                                 <td>
                                                     {isAdmin ? (
                                                         <>
@@ -130,7 +133,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
                             </div>
                             <div className="pagination-container">
                                 <div className="results-text">
-                                    Mostrando {currentPage * itemsPerPage + 1} a {(currentPage + 1) * itemsPerPage} de {noSignedDocuments.length} resultados
+                                    Mostrando {currentPage * itemsPerPage + 1} a {(currentPage + 1) * itemsPerPage} de {documentsToDisplay.length} resultados
                                 </div>
                                 <div className="pagination-buttons">
                                     <button

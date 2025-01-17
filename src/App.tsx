@@ -7,6 +7,7 @@ import Login from "./components/organisms/Login/Login";
 import ListDocuments from "./components/organisms/ListDocuments/ListDocuments";
 import UserTable from "./components/organisms/UserTable/UserTable";
 import ProtectedRoute from "./components/atoms/ProtectedRoute/ProtectedRoute";
+import ResetPassword from "./components/ResetPassword/ResetPassword";
 
 interface User {
     role: number;
@@ -83,6 +84,10 @@ function App() {
                                     <Navigate to="/login" />
                                 )
                             }
+                        />
+                        <Route
+                            path="reset-password"
+                            element={<ResetPassword/>}
                         />
                         {/* Rutas No Definidas */}
                         <Route path="*" element={<Navigate to={isAuthenticated ? "/documentos" : "/login"} />} />

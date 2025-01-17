@@ -3,8 +3,8 @@
 import axios from 'axios';
 import FormData from 'form-data';
 
-//const API_BASE_URL = "https://localhost:7159/api";
-const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
+const API_BASE_URL_2 = "https://localhost:7159/api";
+//const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
 
 interface SignParams {
     certificateFile: File;
@@ -286,5 +286,57 @@ export async function  rejectDocument(documentId: string, reason: string) {
         console.log('Documento rechazado exitosamente: ', response.data);
     } catch (error) {
         throw new Error('Error al rechazar el documento');
+    }
+}
+
+export async function changeStatusUser(userId: string) {
+    try {
+        const response = await axios.put(`${API_BASE_URL_2}/DW/changeStatus/${userId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al cambiar el estado del usuario');
+    }
+}
+
+export async function getAllUsers() {
+    try {
+        const response = await axios.get(`${API_BASE_URL_2}/DW/getAllUsers`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al obtener los usuarios');
+    }
+}
+
+export async function validateToken(token: string) {
+    try {
+        const response = await axios.get(`${API_BASE_URL_2}/DW/validateToken?token=${token}`);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al validar el token');
+    }
+}
+
+export async function changePasswordWithToken(token: string, password: string) {
+    try {
+        const body = {
+            token: token,
+            password: password,
+        };
+        const response = await axios.post(`${API_BASE_URL_2}/DW/changePasswordWithToken`, body);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al actualizar la contraseña.');
+    }
+}
+
+export async function  sendLinkToChangePassword(email: string) {
+    try {
+        const body = {
+          email: email
+        };
+        const response = await axios.post(`${API_BASE_URL_2}/DW/sendPasswordLink`, body);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al enviar el correo.');
     }
 }

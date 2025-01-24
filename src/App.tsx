@@ -7,7 +7,7 @@ import Login from "./components/organisms/Login/Login";
 import ListDocuments from "./components/organisms/ListDocuments/ListDocuments";
 import UserTable from "./components/organisms/UserTable/UserTable";
 import ProtectedRoute from "./components/atoms/ProtectedRoute/ProtectedRoute";
-import ResetPassword from "./components/ResetPassword/ResetPassword";
+import ResetPassword from "./components/organisms/ResetPassword/ResetPassword";
 
 interface User {
     role: number;

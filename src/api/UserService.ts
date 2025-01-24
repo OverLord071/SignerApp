@@ -2,9 +2,12 @@
 
 import axios from 'axios';
 import FormData from 'form-data';
+import {JSEncrypt} from "jsencrypt";
 
-//const API_BASE_URL_2 = "https://localhost:7159/api";
-const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
+
+
+const API_BASE_URL_2 = "https://localhost:7159/api";
+//const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
 
 interface SignParams {
     certificateFile: File;
@@ -27,10 +30,39 @@ interface UpdateDataResponse {
     };
 }
 
+const getPublicKey = async () => {
+    try {
+        const response = await axios.get(API_BASE_URL_2 + "/Key/publicKey");
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener la clave pública:", error);
+        throw error;
+    }
+}
+
 export const authenticateUser = async (usernameOrEmail: string, password: string) => {
     try {
-        const response = await axios.post(`${API_BASE_URL_2}/DW/login?usernameOrEmail=${usernameOrEmail}&password=${password}`);
+        const credentials = {
+            username: usernameOrEmail,
+            password: password
+        };
+
+        const publicKey = await getPublicKey();
+
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+
+        const plainText = JSON.stringify(credentials);
+
+        const encryptedData = encrypt.encrypt(plainText);
+
+        if (!encryptedData) {
+            throw new Error(`Error al cifrar los datos: ${encryptedData}`);
+        }
+
+        const response = await axios.post(`${API_BASE_URL_2}/DW/login`, { encryptedData });
         return response.data;
+
     } catch (error) {
         console.error(error);
         if (axios.isAxiosError(error) && error.response) {
@@ -122,15 +154,40 @@ export async function singPdf(params: SignParams) {
     formData.append('certificateFile', params.certificateFile);
     formData.append('pdfFile', params.pdfFile);
 
-    const encodedPassword = encodeURIComponent(params.password);
+    const requestBody = {
+        password: params.password,
+        reason: params.reason,
+        location: params.location,
+        page: params.page,
+        positionX: params.posX,
+        positionY: params.posY,
+    };
+
+    const publicKey = await getPublicKey();
+
+    const encrypt = new JSEncrypt();
+    encrypt.setPublicKey(publicKey);
+
+    const plainText = JSON.stringify(requestBody);
+
+    const encryptedData = encrypt.encrypt(plainText);
+
+    if (!encryptedData) {
+        throw new Error(`Error al cifrar los datos: ${encryptedData}`);
+    }
+
+    formData.append('encryptedData', encryptedData);
 
     // noinspection Annotator
-    const response = await axios.post(`${API_BASE_URL_2}/DW/sign-pdf?password=${encodedPassword}&reason=${params.reason}&location=${params.location}&page=${params.page}&positionX=${params.posX}&positionY=${params.posY}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'accept': '*/*'
+    const response = await axios.post(`${API_BASE_URL_2}/DW/sign-pdf-encrypted`,
+        formData,
+        {
+                    headers: {
+                                'Content-Type': 'multipart/form-data',
+                                'accept': '*/*'
+                    }
         }
-    });
+    );
     return response.data;
 }
 

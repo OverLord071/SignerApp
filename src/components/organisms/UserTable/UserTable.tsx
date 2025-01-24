@@ -1,7 +1,7 @@
 import React, {FC, useEffect, useState} from 'react';
 import "./UserTable.scss";
 import Button from "../../atoms/Button/Button";
-import {FaEnvelope, FaLock, FaTrash, FaUserCheck, FaUserTimes} from "react-icons/fa";
+import {FaEnvelope, FaTrash, FaUndoAlt, FaUserCheck, FaUserTimes} from "react-icons/fa";
 import {changeStatusUser, getAllUsers, sendLinkToChangePassword} from "../../../api/UserService";
 
 type User = {
@@ -92,7 +92,7 @@ const UserTable:FC = () => {
                                 <td>{user.dateRegister}</td>
                                 <td>
                                     <Button Icon={<FaEnvelope/>} onClick={() => sendResendLink(user.email)}/>
-                                    <Button Icon={<FaLock/>} onClick={() => resetPassword(user.id)}/>
+                                    <Button Icon={<FaUndoAlt/>} onClick={() => resetPassword(user.id)}/>
                                     <Button
                                         Icon={
                                             loading[user.id] ? (

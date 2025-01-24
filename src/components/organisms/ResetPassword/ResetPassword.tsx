@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import { changePasswordWithToken, validateToken} from "../../api/UserService";
+import { changePasswordWithToken, validateToken} from "../../../api/UserService";
 import {useSearchParams} from "react-router-dom";
-import Input from "../atoms/Input/Input";
-import Button from "../atoms/Button/Button";
-import {Errors} from "../../types/validation";
+import Input from "../../atoms/Input/Input";
+import Button from "../../atoms/Button/Button";
+import {Errors} from "../../../types/validation";
 import {useNavigate} from "react-router";
 
 

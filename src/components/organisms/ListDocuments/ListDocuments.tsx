@@ -11,7 +11,7 @@ type Document = {
     url: string;
     isSigned: boolean;
     date: string;
-    expiration: string;
+    expirationDate: string;
     statusDocument: string;
 };
 
@@ -24,7 +24,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [toSignedDocument, setToSignedDocument] = useState<Document|null>();
     const [currentPage, setCurrentPage] = useState<number>(0);
-    const itemsPerPage = 15;
+    const itemsPerPage = 12;
 
     useEffect(()=>{
         const fetchDocuments = async () => {
@@ -111,7 +111,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
                                                 <td>{doc.title}</td>
                                                 <td>{doc.id}</td>
                                                 <td>{doc.date}</td>
-                                                <td>{doc.expiration}</td>
+                                                <td>{doc.expirationDate}</td>
                                                 {isAdmin && <td>{doc.statusDocument}</td>}
                                                 <td>
                                                     {isAdmin ? (

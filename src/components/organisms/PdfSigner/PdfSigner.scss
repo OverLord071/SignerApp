@@ -45,7 +45,7 @@
         text-align: center;
         position: absolute;
         top: 50px;
-        left: 105px;
+        left: 43px;
         width: 116px;
         height: 42px;
         background-color: #def0f6;
@@ -56,35 +56,35 @@
   }
 
   @media (max-width: 1024px) {
-    flex-direction: column; // Cambia el diseño a vertical en pantallas medianas
+    flex-direction: column;
 
     .pdf-viewer {
-      width: 90%; // Reduce el tamaño del visor PDF
-      height: auto; // Ajusta la altura automáticamente
+      width: 90%;
+      height: auto;
     }
 
     .inputs-container {
-      margin-right: 0; // Elimina el margen derecho
-      margin-bottom: 20px; // Agrega margen inferior para separación
+      margin-right: 0;
+      margin-bottom: 20px;
     }
 
     .buttons-container {
       margin-top: 20px;
-      flex-direction: row; // Cambia a una fila
-      gap: 10px; // Reduce el espacio entre botones
+      flex-direction: row;
+      gap: 10px;
     }
   }
 
   @media (max-width: 768px) {
     .pdf-viewer {
-      width: 100%; // Ocupa todo el ancho disponible
+      width: 100%;
       height: auto;
     }
 
     .signature-rectangle {
-      top: 30px; // Ajusta la posición
-      left: 50px; // Cambia la posición horizontal
-      width: 90px; // Reduce el tamaño
+      top: 30px;
+      left: 50px;
+      width: 90px;
       height: 36px;
     }
   }
@@ -98,8 +98,8 @@
     }
 
     .buttons-container {
-      flex-direction: column; // Vuelve a disposición vertical
-      gap: 20px; // Aumenta el espacio entre botones
+      flex-direction: column;
+      gap: 20px;
     }
   }
 }

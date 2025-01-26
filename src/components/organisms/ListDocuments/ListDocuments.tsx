@@ -24,6 +24,8 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
     const [documents, setDocuments] = useState<Document[]>([]);
     const [toSignedDocument, setToSignedDocument] = useState<Document|null>();
     const [currentPage, setCurrentPage] = useState<number>(0);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [documentToDelete, setDocumentToDelete] = useState<Document|null>();
     const itemsPerPage = 12;
 
     useEffect(()=>{
@@ -64,14 +66,29 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
 
     };
 
-    const handleDeleteDocument = async (doc: Document) => {
-        try {
-            const result = await deleteDocument(doc.id);
-            console.log('Documento eliminado con éxito:', result);
-        } catch (error) {
-            console.error('Error al eliminar el documento:', error);
+    const handleDeleteDocument = (doc: Document) => {
+        setDocumentToDelete(doc);
+        setShowConfirmModal(true);
+
+    };
+
+    const confirmDelete = async () => {
+        if (documentToDelete) {
+            try {
+                const result = await deleteDocument(documentToDelete.id);
+                console.log('Documento eliminado con éxito:', result);
+                setDocumentToDelete(null);
+                setShowConfirmModal(false);
+            } catch (error) {
+                console.error('Error al eliminar el documento:', error);
+            }
+            setDocuments(documents.filter(d => d.id !== documentToDelete.id));
         }
-        setDocuments(documents.filter(d => d.id !== doc.id));
+    };
+
+    const cancelDelete = () => {
+        setDocumentToDelete(null);
+        setShowConfirmModal(false);
     };
 
 
@@ -79,8 +96,12 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
         <div className="document-container">
             {toSignedDocument ? (
                 <div className="pdf-signer-container">
-                    <PdfSigner document={toSignedDocument} onSignSuccess={handleSignSuccess}
-                               onSignFailure={handleSignFailure}/>
+                    <PdfSigner
+                        document={toSignedDocument}
+                        onSignSuccess={handleSignSuccess}
+                        onSignFailure={handleSignFailure}
+                        onCancel={()=>setToSignedDocument(null)}
+                    />
                 </div>
             ) : (
                 <>
@@ -151,6 +172,18 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
                         </>
                     )}
                 </>
+            )}
+            {showConfirmModal && (
+                <div className="confirm-modal">
+                    <div className="confirm-modal-content">
+                        <h3>Esta seguro de eliminar este documento?</h3>
+                        <p>{documentToDelete?.title}</p>
+                        <div className="confirm-modal-actions">
+                            <Button text="Confirmar"  variant="primary" onClick={confirmDelete}/>
+                            <Button text="Cancelar" variant="cancel" onClick={cancelDelete} />
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

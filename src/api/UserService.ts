@@ -1,10 +1,7 @@
 // noinspection Annotator
-
 import axios from 'axios';
 import FormData from 'form-data';
 import {JSEncrypt} from "jsencrypt";
-
-
 
 const API_BASE_URL_2 = "https://localhost:7159/api";
 //const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
@@ -18,16 +15,7 @@ interface SignParams {
     page: number;
     posX: number;
     posY: number;
-}
-
-interface UpdateDataResponse {
-    mensaje: string;
-    data: {
-        documento: string | null;
-        fileCabinet: string;
-        dwdocid: number;
-        estado: string;
-    };
+    documentId: string;
 }
 
 const getPublicKey = async () => {
@@ -89,64 +77,6 @@ export const authenticateWithToken = async (token: string) => {
     }
 }
 
-export const getToken = async () => {
-    const data = {
-        "uri": "https://dwdemos.digitalsolutions.com.ec/DocuWare/Platform/",
-        "user": "Christian.Albarracin",
-        "pasw": "DS-1820",
-        "fid": "6e3dfea0-5b96-4a89-bd9d-b2ec86e71bb3"
-    };
-
-    try {
-        const response = await axios.post('https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Authentication/Validar', data);
-        return response.data.token;
-    } catch (error) {
-        console.error(error);
-        if (axios.isAxiosError(error) && error.response) {
-            console.error(error.response.data);
-            throw new Error(JSON.stringify(error.response.data.message, null, 2));
-        } else {
-            throw new Error(`Error desconocido al obtener el token: ${error}`);
-        }
-    }
-};
-
-export async function replaceFileContent(token: string, documentoCodificado: string, documentId: string) {
-    try {
-        // noinspection Annotator
-        const response = await axios.post('https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Item/ReplaceFileContentJ', {
-            documentoCodificado: documentoCodificado,
-            extension: 'pdf',
-            fid: '6e3dfea0-5b96-4a89-bd9d-b2ec86e71bb3',
-            campoBusqueda: 'ID_DOCUMENTO',
-            valorBusqueda: documentId
-        }, {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-            }
-        });
-        return response.data;
-    } catch (error) {
-        throw new Error('Error al reemplazar el contenido del archivo');
-    }
-}
-
-export async function updateData(dwdocid: number, token: string): Promise<UpdateDataResponse> {
-     try {
-         const response = await axios.put(`https://dwdemos.digitalsolutions.com.ec/dwapi2/api/Item/UpdateData/${dwdocid}`,{
-             indices: "ESTADO:OK|",
-             documentoCodificado: "",
-             extension: ""
-         }, {
-             headers: {
-                 'Authorization': 'Bearer ' + token,
-             }
-         });
-         return response.data;
-     } catch (error) {
-         throw new Error(`Error al actualizar los datos: ${error}`);
-     }
-}
 
 export async function singPdf(params: SignParams) {
     const formData = new FormData();
@@ -161,6 +91,7 @@ export async function singPdf(params: SignParams) {
         page: params.page,
         positionX: params.posX,
         positionY: params.posY,
+        documentId: params.documentId
     };
 
     const publicKey = await getPublicKey();
@@ -252,15 +183,6 @@ export async function getAllDocuments() {
     } catch (error) {
         console.log(error);
         throw new Error('Error al obtener los documentos');
-    }
-}
-
-export async function updateDocumentIsSigned(id: string) {
-    try {
-        const response = await axios.put(`${API_BASE_URL_2}/Document/${id}`);
-        return response.data;
-    } catch (error) {
-        throw new Error('Error al actualizar el documento');
     }
 }
 

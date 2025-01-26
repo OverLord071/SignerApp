@@ -7,14 +7,7 @@ import Button from "../../atoms/Button/Button";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
 import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
-import {
-    getToken,
-    rejectDocument,
-    replaceFileContent,
-    singPdf,
-    updateData,
-    updateDocumentIsSigned
-} from "../../../api/UserService";
+import {rejectDocument, singPdf} from "../../../api/UserService";
 import {Errors, validateField} from "../../../types/validation";
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -38,12 +31,14 @@ interface SignParams {
     page: number;
     posX: number;
     posY: number;
+    documentId: string;
 }
 
 interface PdfSignerProps {
     document: Document | null;
     onSignSuccess: Function;
     onSignFailure: Function;
+    onCancel: () => void;
 }
 
 interface ErrorResponse {
@@ -51,7 +46,7 @@ interface ErrorResponse {
     pdfFile?: string[];
 }
 
-const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}) => {
+const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure, onCancel}) => {
     const [reason, setReason] = useState<string>('');
     const [location, setLocation] = useState<string>('');
     const [urlPdfFile, setUrlPdfFile] = useState('');
@@ -129,6 +124,8 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
         if (Object.keys(newErrors).length === 0) {
             if (certificateFile && pdfBlob) {
                 try {
+                    toast.info('Iniciando el proceso de firmado...');
+
                     const signParams : SignParams = {
                         certificateFile: certificateFile,
                         password: pin,
@@ -136,54 +133,54 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                         reason: reason,
                         location: location,
                         page: currentPage,
-                        posX: x,
-                        posY: -y + 796
+                        posX: x + 24,
+                        posY: -y + 770,
+                        documentId: document?.id ?? '',
                     };
 
-                    const signedPdfBase64 = await singPdf(signParams);
-                    toast.success('El documento se firmo correctamente.');
-                    const pdfFileName = document ? document.id : '';
-                    try {
-                        const token = await getToken();
-                        const replaceResponse = await replaceFileContent(token ,signedPdfBase64, pdfFileName);
-                        toast.info('Cargando documento a DocuWare...');
+                    const response = await singPdf(signParams);
 
-                        await new Promise(resolve => setTimeout(resolve, 5000));
-                        const updateResponse = await updateData(replaceResponse.objeto.dwdocid, token);
+                    toast.info('El documento está siendo procesado en DocuWare...');
+                    await waitForResponse(5000);
 
-                        if (updateResponse.data.estado !== 'UPDATED') {
-                            toast.error('El estado del documento no se actualizó.');
-                        }
-
-                        await updateDocumentIsSigned(pdfFileName);
-                        toast.success("El documento se cargo correctamente.");
-                        setTimeout(() => {
-                            onSignSuccess();
-                        }, 1000);
-                    } catch (error) {
-                        toast.error('Hubo un error al reemplazar el documento.');
-                        setTimeout(() => {
-                            onSignFailure();
-                        }, 1000);
-                    }
+                    toast.success(response);
+                    onSignSuccess();
 
                 } catch (error) {
                     const axiosError = error as AxiosError;
                     const errors = axiosError.response?.data as ErrorResponse;
+
                     if (axiosError.response?.status === 500){
-                        toast.error('Error: ' + axiosError.response.data);
+                        const serverError = axiosError.response?.data;
+                        if (typeof serverError === 'string') {
+                            if (serverError.toLowerCase().includes('timeout')) {
+                                toast.error('Timeout al conectar con el servidor. Inténtelo nuevamente.');
+                            } else if (serverError.toLowerCase().includes('contraseña incorrecta')) {
+                                toast.error('Contraseña del certificado incorrecta o archivo corrupto.');
+                            } else {
+                                toast.error(`Error inesperado del servidor: ${serverError}`);
+                            }
+                        } else {
+                            toast.error('Error inesperado al firmar el documento.');
+                        }
                     } else if (axiosError.response?.status === 400) {
                         if (errors.certificateFile) {
                             toast.error('El certificado es requerido.');
                         } else if (errors.pdfFile) {
                             toast.error('El pdf es requerido.');
+                        } else {
+                            toast.error('Error en la solicitud. Verifique los campos ingresados.');
                         }
                     }
                 }
             } else {
-                console.error('Falta el certificado o el pdf');
+                toast.error('Falta el certificado o el pdf');
             }
         }
+    };
+
+    const waitForResponse = (ms: number) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
     };
 
     const handleRejectDocument= async (event: React.FormEvent) => {
@@ -237,6 +234,7 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure}
                             <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>
                             <Button text="Firmar" onClick={handleSingClick}/>
                             <Button text="Rechazar" variant="cancel" onClick={() => setIsRejecting(true)}/>
+                            <Button text="Regresar" variant="return" onClick={onCancel} />
                         </div>
                     </>
                 ) : (

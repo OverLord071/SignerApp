@@ -108,7 +108,7 @@ const UserTable:FC = () => {
                                         isActive={user.isActive}
                                         disabled={loading[user.id]}
                                     />
-                                    <Button Icon={<FaTrash/>} variant="cancel--small" onClick={() => handleDelete(user.id)}/>
+                                    <Button Icon={<FaTrash/>} variant="cancel" onClick={() => handleDelete(user.id)}/>
                                 </td>
                             </tr>
                         ))}

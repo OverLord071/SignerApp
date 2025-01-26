@@ -3,8 +3,8 @@ import axios from 'axios';
 import FormData from 'form-data';
 import {JSEncrypt} from "jsencrypt";
 
-const API_BASE_URL_2 = "https://localhost:7159/api";
-//const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
+//const API_BASE_URL_2 = "https://localhost:7159/api";
+const API_BASE_URL_2 = "https://dwdemos.digitalsolutions.com.ec/signer/api";
 
 interface SignParams {
     certificateFile: File;

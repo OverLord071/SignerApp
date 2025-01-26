@@ -69,14 +69,13 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
     const handleDeleteDocument = (doc: Document) => {
         setDocumentToDelete(doc);
         setShowConfirmModal(true);
-
     };
 
     const confirmDelete = async () => {
         if (documentToDelete) {
             try {
-                const result = await deleteDocument(documentToDelete.id);
-                console.log('Documento eliminado con éxito:', result);
+                await deleteDocument(documentToDelete.id);
+                alert('Documento eliminado con éxito');
                 setDocumentToDelete(null);
                 setShowConfirmModal(false);
             } catch (error) {

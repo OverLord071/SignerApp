@@ -2,7 +2,12 @@ import React, {FC, useEffect, useState} from 'react';
 import "./UserTable.scss";
 import Button from "../../atoms/Button/Button";
 import {FaEnvelope, FaTrash, FaUndoAlt, FaUserCheck, FaUserTimes} from "react-icons/fa";
-import {changeStatusUser, getAllUsers, sendLinkToChangePassword} from "../../../api/UserService";
+import {
+    changeStatusUser,
+    deleteUser, generateRandomPassword,
+    getAllUsers,
+    sendLinkToChangePassword
+} from "../../../api/UserService";
 
 type User = {
     id: string;
@@ -17,6 +22,8 @@ const UserTable:FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(0);
     const itemsPerPage = 20;
     const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<User|null>();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -57,13 +64,37 @@ const UserTable:FC = () => {
         }
     };
 
-    const resetPassword = (id: string) => {
-        console.log(`Edit user ${id}`);
+    const resetPassword = async (email: string) => {
+        try {
+            const response = await generateRandomPassword(email);
+            alert(response);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    const handleDelete = (id: string) => {
-        console.log(`Delete user ${id}`);
-        setUsers(users.filter((user) => user.id !== id));
+    const handleDeleteUser = (user: User) => {
+        setUserToDelete(user);
+        setShowConfirmModal(true);
+    };
+
+    const confirmDelete = async () => {
+        if (userToDelete) {
+            try {
+                await deleteUser(userToDelete.id);
+                alert('Usuario eliminado con éxito');
+                setUserToDelete(null);
+                setShowConfirmModal(false);
+            } catch (error) {
+                console.error('Error al eliminar el usuario:', error);
+            }
+            setUsers(users.filter((user) => user.id !== userToDelete.id));
+        }
+    };
+
+    const cancelDelete = () => {
+        setUserToDelete(null);
+        setShowConfirmModal(false);
     };
 
     const pageCount = Math.ceil(users.length / itemsPerPage);
@@ -92,7 +123,7 @@ const UserTable:FC = () => {
                                 <td>{user.dateRegister}</td>
                                 <td>
                                     <Button Icon={<FaEnvelope/>} onClick={() => sendResendLink(user.email)}/>
-                                    <Button Icon={<FaUndoAlt/>} onClick={() => resetPassword(user.id)}/>
+                                    <Button Icon={<FaUndoAlt/>} onClick={() => resetPassword(user.email)}/>
                                     <Button
                                         Icon={
                                             loading[user.id] ? (
@@ -108,7 +139,7 @@ const UserTable:FC = () => {
                                         isActive={user.isActive}
                                         disabled={loading[user.id]}
                                     />
-                                    <Button Icon={<FaTrash/>} variant="cancel" onClick={() => handleDelete(user.id)}/>
+                                    <Button Icon={<FaTrash/>} variant="cancel" onClick={() => handleDeleteUser(user)}/>
                                 </td>
                             </tr>
                         ))}
@@ -133,6 +164,18 @@ const UserTable:FC = () => {
                     Siguiente
                 </button>
             </div>
+            {showConfirmModal && (
+                <div className="confirm-modal">
+                    <div className="confirm-modal-content">
+                        <h3>Esta seguro de eliminar este usuario?</h3>
+                        <p>{userToDelete?.name}</p>
+                        <div className="confirm-modal-actions">
+                            <Button text="Confirmar"  variant="primary" onClick={confirmDelete}/>
+                            <Button text="Cancelar" variant="cancel" onClick={cancelDelete} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

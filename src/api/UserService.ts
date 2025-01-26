@@ -131,6 +131,15 @@ export async function createUser(user: any) {
     }
 }
 
+export async function deleteUser(userId: string) {
+  try {
+      const response = await axios.delete(`${API_BASE_URL_2}/DW/${userId}`);
+      return response.data;
+  }  catch (error) {
+      throw new Error("Error al eliminar el usuario");
+  }
+}
+
 export async function sendPinValidation(email: string) {
     try {
         const response = await axios.post(`${API_BASE_URL_2}/DW/sendPinValidation?email=${email}`);
@@ -317,5 +326,17 @@ export async function  sendLinkToChangePassword(email: string) {
         return response.data;
     } catch (error) {
         throw new Error('Error al enviar el correo.');
+    }
+}
+
+export async function generateRandomPassword(email: string) {
+    try {
+        const body = {
+          email: email,
+        };
+        const response = await axios.post(`${API_BASE_URL_2}/DW/generate-random-password`, body);
+        return response.data;
+    } catch (error) {
+        throw new Error('Error al reiniciar la contraseña.');
     }
 }

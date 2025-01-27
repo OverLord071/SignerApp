@@ -14,10 +14,11 @@ interface InputProps {
     pattern?: string;
     required?: boolean;
     isSubmitted?: boolean;
+    disabled?: boolean;
     label?: string;
 }
 
-const Input: FC<InputProps> = ({ type, placeholder, value, onChange, Icon, IconError = FaExclamationCircle, error, pattern, required, isSubmitted, label }) => {
+const Input: FC<InputProps> = ({ type, placeholder, value, onChange, Icon, IconError = FaExclamationCircle, error, pattern, required, isSubmitted, disabled, label }) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -46,6 +47,7 @@ const Input: FC<InputProps> = ({ type, placeholder, value, onChange, Icon, IconE
                     className="input-field"
                     pattern={pattern}
                     required={required}
+                    disabled={disabled}
                 />
                 {Icon && <Icon className="input-icon"/>}
                 {type === 'password' && (

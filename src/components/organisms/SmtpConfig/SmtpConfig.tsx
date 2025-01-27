@@ -3,10 +3,11 @@ import "./SmtpConfig.scss";
 import Input from "../../atoms/Input/Input";
 import Button from "../../atoms/Button/Button";
 import InputFile from "../../atoms/InputFile/InputFile";
-import {createSmtpConfig, getSmtpConfig} from "../../../api/UserService";
+import {createSmtpConfig, getSmtpConfig, testSmtpConnection, updateSmtpConfig} from "../../../api/UserService";
 
 const SmtpConfig = () => {
     const [smtpConfig, setSmtpConfig] = useState<{
+        id: number;
         host: string;
         port: number;
         useSsl: boolean;
@@ -19,7 +20,12 @@ const SmtpConfig = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [logo, setLogo] = useState<File | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
 
+    const [testInputsVisible, setTestInputsVisible] = useState(false);
+    const [testRecipient, setTestRecipient] = useState("");
+    const [testSubject, setTestSubject] = useState("");
+    const [testBody, setTestBody] = useState("");
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -31,6 +37,7 @@ const SmtpConfig = () => {
                 const data = await getSmtpConfig();
                 if (data.length > 0) {
                     const config = data[0];
+                    setSmtpConfig(config.id);
                     setSmtpConfig(config);
                     setHost(config.host);
                     setPort(config.port);
@@ -64,8 +71,14 @@ const SmtpConfig = () => {
                 password,
             };
 
-            await createSmtpConfig(configData);
+            if (smtpConfig) {
+                await updateSmtpConfig(smtpConfig.id, configData);
+            } else {
+                await createSmtpConfig(configData);
+            }
+
             alert("Configuración SMTP guardada exitosamente");
+            setIsEditMode(false);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -73,9 +86,25 @@ const SmtpConfig = () => {
         }
     };
 
-    const handleTestConnection = () => {
-        alert("Probar conexión SMTP (pendiente de implementación)");
-        // Implementar lógica para probar la conexión SMTP aquí.
+    const handleTestConnection = async () => {
+        if (!testRecipient || !testSubject || !testBody) {
+            alert("Por favor, complete todos los campos para probar la conexión.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await testSmtpConnection({
+                recipient: testRecipient,
+                subject: testSubject,
+                body: testBody,
+            });
+            alert(response.message || "Conexión SMTP probada exitosamente");
+        } catch (err: any) {
+            alert("Error al probar la conexión SMTP: " + err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -93,6 +122,7 @@ const SmtpConfig = () => {
                     label="Servidor SMTP"
                     required
                     isSubmitted={isSubmitted}
+                    disabled={!isEditMode}
                     error={!host ? "El servidor SMTP es obligatorio" : ""}
                 />
                 <Input
@@ -103,6 +133,7 @@ const SmtpConfig = () => {
                     label="Puerto"
                     required
                     isSubmitted={isSubmitted}
+                    disabled={!isEditMode}
                     error={!port ? "El puerto es obligatorio" : ""}
                 />
                 <Input
@@ -113,6 +144,7 @@ const SmtpConfig = () => {
                     label="Correo Remitente"
                     required
                     isSubmitted={isSubmitted}
+                    disabled={!isEditMode}
                     error={!username ? "El correo es obligatorio" : ""}
                 />
                 <Input
@@ -123,13 +155,48 @@ const SmtpConfig = () => {
                     label="Contraseña"
                     required
                     isSubmitted={isSubmitted}
+                    disabled={!isEditMode}
                     error={!password ? "La contraseña es obligatoria" : ""}
                 />
+                {isEditMode ? (
+                    <Button text="Guardar Configuración SMTP" type="button" onClick={handleSaveConfig} />
+                ) : (
+                    <Button text="Editar Configuración" type="button" variant="return" onClick={() => setIsEditMode(true)} />
+                )}
                 <Button
-                    text={smtpConfig ? "Probar Conexión" : "Guardar Configuración SMTP"}
+                    text="Probar Conexión SMTP"
                     type="button"
-                    onClick={smtpConfig ? handleTestConnection : handleSaveConfig}
+                    onClick={()=> setTestInputsVisible(!testInputsVisible)}
                 />
+                {testInputsVisible && (
+                    <div className="test-smtp-container">
+                        <Input
+                            type="email"
+                            placeholder="Destinatario"
+                            value={testRecipient}
+                            onChange={setTestRecipient}
+                            label="Destinatario"
+                            required
+                        />
+                        <Input
+                            type="text"
+                            placeholder="Asunto"
+                            value={testSubject}
+                            onChange={setTestSubject}
+                            label="Asunto"
+                            required
+                        />
+                        <Input
+                            type="text"
+                            placeholder="Mensaje"
+                            value={testBody}
+                            onChange={setTestBody}
+                            label="Mensaje"
+                            required
+                        />
+                        <Button text="Enviar Prueba" type="button" onClick={handleTestConnection} />
+                    </div>
+                )}
             </div>
             <div className="smtp-config-right">
                 <h2>Configuracion del Logo</h2>

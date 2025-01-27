@@ -16,6 +16,7 @@
   .smtp-config-left {
     display: flex;
     flex-direction: column;
+    gap: $padding-base;
 
     h2 {
       margin-bottom: $padding-large;

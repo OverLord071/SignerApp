@@ -340,3 +340,42 @@ export async function generateRandomPassword(email: string) {
         throw new Error('Error al reiniciar la contraseña.');
     }
 }
+
+export async function updateSmtpConfig(
+    id: number,
+    data: {
+        host: string;
+        port: number;
+        useSsl: boolean;
+        username: string;
+        password: string;
+    }
+) {
+    try {
+        const response = await axios.put(`${API_BASE_URL_2}/SmtpConfig/${id}`, data);
+        return response.status === 204;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Error al actualizar la configuración SMTP");
+        } else {
+            throw new Error("Error de red al actualizar la configuración SMTP");
+        }
+    }
+}
+
+export async function testSmtpConnection(data: {
+    recipient: string;
+    subject: string;
+    body: string;
+}) {
+    try {
+        const response = await axios.post(`${API_BASE_URL_2}/Email`, data);
+        return response.data;
+    } catch (error: any) {
+        if (axios.isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.message || "Error al probar la conexión SMTP");
+        } else {
+            throw new Error("Error de red al probar la conexión SMTP");
+        }
+    }
+}

@@ -135,8 +135,10 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure,
                         page: currentPage,
                         posX: x + 24,
                         posY: -y + 770,
-                        documentId: document?.id ?? '',
+                        documentId: document ? document.id : '',
                     };
+
+                    console.log(signParams);
 
                     const response = await singPdf(signParams);
 
@@ -144,6 +146,7 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure,
                     await waitForResponse(5000);
 
                     toast.success(response);
+                    await waitForResponse(1000);
                     onSignSuccess();
 
                 } catch (error) {

@@ -379,3 +379,31 @@ export async function testSmtpConnection(data: {
         }
     }
 }
+
+export const getLogo = async (): Promise<{ logoUrl: string } | null> => {
+    try {
+        const response = await axios.get<{logoUrl:string}>(`${API_BASE_URL_2}/Logo`);
+        return response.data ?? null;
+    } catch (error) {
+        console.error("Error obteniendo el logo:", error);
+        return null;
+    }
+};
+
+export const uploadLogo = async (file: File): Promise<{logoUrl: string}> => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await axios.post<{ logoUrl: string }>(`${API_BASE_URL_2}/Logo`, formData);
+
+        if (!response.data?.logoUrl) {
+            throw new Error("Respuesta inválida del servidor");
+        }
+
+        return response.data; // Retorna la ruta del logo guardado en el servidor
+    } catch (error) {
+        console.error("Error subiendo el logo:", error);
+        throw new Error("No se pudo subir el logo.");
+    }
+};

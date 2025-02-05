@@ -143,7 +143,7 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure,
                     const response = await singPdf(signParams);
 
                     toast.info('El documento está siendo procesado en DocuWare...');
-                    await waitForResponse(5000);
+                    await waitForResponse(2000);
 
                     toast.success(response);
                     await waitForResponse(1000);
@@ -208,30 +208,35 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure,
             <div className="inputs-container">
                 {!isRejecting ? (
                     <>
-                        <Input
-                            type="text"
-                            placeholder="Razón"
-                            value={reason}
-                            onChange={setReason}
-                            label="Razón"
-                        />
-                        <Input
-                            type="text"
-                            placeholder="Ubicación"
-                            value={location}
-                            onChange={setLocation}
-                            label="Ubicación"
-                        />
-                        <Input
-                            type="password"
-                            placeholder="Pin Certificado"
-                            value={pin}
-                            onChange={(value) => handleInputChange(value, setPin, 'pin', '')}
-                            label="Pin Certificado"
-                            error={errors.pin}
-                            required
-                            isSubmitted={isSubmitted}
-                        />
+                        <form autoComplete="off">
+                            <Input
+                                type="text"
+                                placeholder="Razón"
+                                value={reason}
+                                onChange={setReason}
+                                label="Razón"
+                                autoComplete="off"
+                            />
+                            <Input
+                                type="text"
+                                placeholder="Ubicación"
+                                value={location}
+                                onChange={setLocation}
+                                label="Ubicación"
+                                autoComplete="off"
+                            />
+                            <Input
+                                type="password"
+                                placeholder="Pin Certificado"
+                                value={pin}
+                                onChange={(value) => handleInputChange(value, setPin, 'pin', '')}
+                                label="Pin Certificado"
+                                error={errors.pin}
+                                required
+                                isSubmitted={isSubmitted}
+                                autoComplete="off"
+                            />
+                        </form>
                         <div className="buttons-container">
                             <input type="file" ref={certInputRef} style={{display: 'none'}} onChange={handleCertChange}/>
                             <Button text="Cargar certificado" onClick={handleCertClick} variant="file"/>

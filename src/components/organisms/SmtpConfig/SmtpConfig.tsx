@@ -3,7 +3,13 @@ import "./SmtpConfig.scss";
 import Input from "../../atoms/Input/Input";
 import Button from "../../atoms/Button/Button";
 import InputFile from "../../atoms/InputFile/InputFile";
-import {createSmtpConfig, getSmtpConfig, testSmtpConnection, updateSmtpConfig} from "../../../api/UserService";
+import {
+    createSmtpConfig, getLogo,
+    getSmtpConfig,
+    testSmtpConnection,
+    updateSmtpConfig,
+    uploadLogo
+} from "../../../api/UserService";
 
 const SmtpConfig = () => {
     const [smtpConfig, setSmtpConfig] = useState<{
@@ -20,6 +26,7 @@ const SmtpConfig = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [logo, setLogo] = useState<File | null>(null);
+    const [logoUrl, setLogoUrl] = useState<string>("");
     const [isEditMode, setIsEditMode] = useState(false);
 
     const [testInputsVisible, setTestInputsVisible] = useState(false);
@@ -51,6 +58,18 @@ const SmtpConfig = () => {
             }
         };
 
+        const fetchLogo = async ()=>{
+          try {
+              const response = await getLogo();
+              if (response && response.logoUrl) {
+                  setLogoUrl(response.logoUrl);
+              }
+          } catch (error: any) {
+              console.error("Error al obtener el logo:", error.message);
+          }
+        };
+
+        fetchLogo();
         fetchConfig();
     }, []);
 
@@ -79,6 +98,26 @@ const SmtpConfig = () => {
 
             alert("Configuración SMTP guardada exitosamente");
             setIsEditMode(false);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveLogo = async ()=>{
+        if (!logo) return alert("Debe seleccionar un logo.");
+
+        try {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append("file", logo);
+
+            const response = await uploadLogo(logo);
+            if (response && response.logoUrl) {
+                setLogoUrl(response.logoUrl);
+                alert("Logo actualizado exitosamente");
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -205,12 +244,19 @@ const SmtpConfig = () => {
                 />
                 {logo && (
                     <div className="logo-preview">
-                        <h4>Vista previa del logo:</h4>
+                        <h4>Logo Actual</h4>
                         <img
-                            src={URL.createObjectURL(logo)}
-                            alt="Vista previa del logo"
+                            src={logoUrl}
+                            alt="Logo"
                             className="logo-image-preview"
                         />
+                    </div>
+                )}
+                {logo && (
+                    <div className="logo-preview">
+                        <h4>Vista previa del nuevo logo:</h4>
+                        <img src={URL.createObjectURL(logo)} alt="Vista previa" className="logo-image-preview" />
+                        <Button text="Guardar Logo" type="button" onClick={handleSaveLogo} />
                     </div>
                 )}
             </div>

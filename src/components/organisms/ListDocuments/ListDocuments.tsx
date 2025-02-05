@@ -26,7 +26,7 @@ const ListDocuments : FC<ListDocumentsProps> = ({ email, isAdmin}) => {
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [documentToDelete, setDocumentToDelete] = useState<Document|null>();
-    const itemsPerPage = 12;
+    const itemsPerPage = 11;
 
     useEffect(()=>{
         const fetchDocuments = async () => {

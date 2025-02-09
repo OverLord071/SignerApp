@@ -138,8 +138,6 @@ const PdfSigner: FC<PdfSignerProps> = ({ document, onSignSuccess, onSignFailure,
                         documentId: document ? document.id : '',
                     };
 
-                    console.log(signParams);
-
                     const response = await singPdf(signParams);
 
                     toast.info('El documento está siendo procesado en DocuWare...');
